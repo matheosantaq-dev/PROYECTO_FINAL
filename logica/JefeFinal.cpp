@@ -1,0 +1,58 @@
+#include "JefeFinal.h"
+
+JefeFinal::JefeFinal(float x, float y)
+    : Enemigo(x, y)
+{
+    vida = 200;
+
+    fase = 1;
+
+    velocidadMovimiento = 5;
+
+    velocidadAtaque = 1.0;
+
+    tiempoAtaque = 0;
+}
+
+void JefeFinal::actualizar()
+{
+    mover();
+
+    tiempoAtaque++;
+
+    // Movimiento lateral del jefe
+    if(x <= 100)
+    {
+        velocidadX = velocidadMovimiento;
+    }
+
+    if(x >= 700)
+    {
+        velocidadX = -velocidadMovimiento;
+    }
+
+    // Cambio de fase según vida
+    if(vida <= 100 && fase == 1)
+    {
+        cambiarFase();
+    }
+}
+
+void JefeFinal::cambiarFase()
+{
+    fase = 2;
+
+    velocidadMovimiento = 8;
+
+    velocidadAtaque = 2.0;
+}
+
+int JefeFinal::getFase() const
+{
+    return fase;
+}
+
+int JefeFinal::getTiempoAtaque() const
+{
+    return tiempoAtaque;
+}
