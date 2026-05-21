@@ -1,4 +1,9 @@
+
+
+
 #include "NivelBoss.h"
+
+#include <cmath>
 
 NivelBoss::NivelBoss()
 {
@@ -34,13 +39,10 @@ NivelBoss::~NivelBoss()
 
 void NivelBoss::cargarNivel()
 {
-    // Crear jugador
-    jugador = new Jugador(400, 700);
+    jugador = new Jugador(400,700);
 
-    // Crear jefe
-    jefe = new JefeFinal(400, 100);
+    jefe = new JefeFinal(400,100);
 
-    // Crear IA
     ia = new AgenteIA(
         jugador,
         jefe,
@@ -50,19 +52,14 @@ void NivelBoss::cargarNivel()
 
 void NivelBoss::actualizar()
 {
-    // Actualizar tiempo
     temporizador.actualizar();
 
-   
     jugador->actualizar();
 
-  
     jefe->actualizar();
 
-    
     ia->actualizarIA();
 
-    // Activar modo furia
     if(temporizador.getTiempoActual() >= 30
         && !modoFuria)
     {
@@ -70,9 +67,7 @@ void NivelBoss::actualizar()
 
         jefe->setVelocidadX(12);
 
-        jefe->setVida(
-            jefe->getVida() + 200
-        );
+        jefe->setVida(400);
     }
 
     for(Dardo* dardo : dardos)
@@ -80,31 +75,30 @@ void NivelBoss::actualizar()
         dardo->actualizar();
     }
 
-
     for(Balon* balon : balones)
     {
         balon->actualizar();
     }
 
- 
     if(jefe->getTiempoAtaque() % 120 == 0)
     {
         lanzarDardo();
     }
 
-    // Colisiones balones vs jefe
     for(Balon* balon : balones)
     {
         if(balon->estaActivo())
         {
             float dx =
-                balon->getX() - jefe->getX();
+                balon->getX()
+                - jefe->getX();
 
             float dy =
-                balon->getY() - jefe->getY();
+                balon->getY()
+                - jefe->getY();
 
-            if(dx < 50 && dx > -50 &&
-               dy < 50 && dy > -50)
+            if(std::abs(dx) < 50
+                && std::abs(dy) < 50)
             {
                 balon->desactivar();
 
@@ -115,8 +109,64 @@ void NivelBoss::actualizar()
         }
     }
 
-    // Verificar derrota del jefe
+    for(Dardo* dardo : dardos)
+    {
+        if(dardo->estaActivo())
+        {
+            float dx =
+                dardo->getX()
+                - jugador->getX();
+
+            float dy =
+                dardo->getY()
+                - jugador->getY();
+
+            if(std::abs(dx) < 40
+                && std::abs(dy) < 40)
+            {
+                dardo->desactivar();
+
+                jugador->recibirDanio(10);
+            }
+        }
+    }
+
+    for(auto it = balones.begin();
+        it != balones.end();)
+    {
+        if(!(*it)->estaActivo())
+        {
+            delete *it;
+
+            it = balones.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    for(auto it = dardos.begin();
+        it != dardos.end();)
+    {
+        if(!(*it)->estaActivo())
+        {
+            delete *it;
+
+            it = dardos.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
     if(!jefe->estaVivo())
+    {
+        terminado = true;
+    }
+
+    if(!jugador->estaVivo())
     {
         terminado = true;
     }
@@ -159,4 +209,16 @@ int NivelBoss::getTiempo() const
 JefeFinal* NivelBoss::getJefe() const
 {
     return jefe;
+}
+
+std::vector<Dardo*>&
+NivelBoss::getDardos()
+{
+    return dardos;
+}
+
+std::vector<Balon*>&
+NivelBoss::getBalones()
+{
+    return balones;
 }
