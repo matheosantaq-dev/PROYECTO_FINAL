@@ -1,40 +1,81 @@
-#ifndef JUGADOR_H
-#define JUGADOR_H
-
 #include "Entidad.h"
 
-class Jugador : public Entidad
+Entidad::Entidad(float x, float y)
 {
-private:
+    this->x = x;
 
-    int vida;
+    this->y = y;
 
-    bool saltando;
-    bool agachado;
+    velocidadX = 0;
 
-    bool tieneBalon;
+    velocidadY = 0;
 
-public:
+    ancho = 64;
 
-    Jugador(float x, float y);
+    alto = 64;
+}
 
-    void mover() override;
-    void actualizar() override;
+Entidad::~Entidad()
+{
 
-    void moverIzquierda();
-    void moverDerecha();
+}
 
-    void detener();
+float Entidad::getX() const
+{
+    return x;
+}
 
-    void saltar();
+float Entidad::getY() const
+{
+    return y;
+}
 
-    void agacharse();
-    void levantarse();
+float Entidad::getVelocidadX() const
+{
+    return velocidadX;
+}
 
-    int getVida() const;
+float Entidad::getVelocidadY() const
+{
+    return velocidadY;
+}
 
-    bool getTieneBalon() const;
-    void setTieneBalon(bool valor);
-};
+int Entidad::getAncho() const
+{
+    return ancho;
+}
 
-#endif
+int Entidad::getAlto() const
+{
+    return alto;
+}
+
+void Entidad::setX(float x)
+{
+    this->x = x;
+}
+
+void Entidad::setY(float y)
+{
+    this->y = y;
+}
+
+void Entidad::setVelocidadX(float velocidad)
+{
+    velocidadX = velocidad;
+}
+
+void Entidad::setVelocidadY(float velocidad)
+{
+    velocidadY = velocidad;
+}
+
+void Entidad::setAncho(int ancho)
+{
+    this->ancho = ancho;
+}
+
+void Entidad::setAlto(int alto)
+{
+    this->alto = alto;
+}
