@@ -1,9 +1,14 @@
+// =========================
+// NivelBoss.h
+// =========================
+
 #ifndef NIVELBOSS_H
 #define NIVELBOSS_H
 
 #include <vector>
 
 #include "Nivel.h"
+
 #include "JefeFinal.h"
 #include "Dardo.h"
 #include "Balon.h"
@@ -40,7 +45,7 @@ public:
 
     void cargarNivel() override;
 
-    void lanzarBalon();
+    void lanzarBalon() override;
 
     void lanzarDardo();
 
@@ -49,6 +54,12 @@ public:
     int getTiempo() const;
 
     JefeFinal* getJefe() const;
+
+    std::vector<Dardo*>&
+    getDardos();
+
+    std::vector<Balon*>&
+    getBalones();
 };
 
 #endif
