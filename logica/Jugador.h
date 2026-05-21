@@ -1,3 +1,5 @@
+
+
 #ifndef JUGADOR_H
 #define JUGADOR_H
 
@@ -10,18 +12,25 @@ private:
     int vida;
 
     bool saltando;
+
     bool agachado;
 
     bool tieneBalon;
+
+    float gravedad;
+
+    float fuerzaSalto;
 
 public:
 
     Jugador(float x, float y);
 
     void mover() override;
+
     void actualizar() override;
 
     void moverIzquierda();
+
     void moverDerecha();
 
     void detener();
@@ -29,11 +38,21 @@ public:
     void saltar();
 
     void agacharse();
+
     void levantarse();
+
+    void recibirDanio(int danio);
+
+    bool estaVivo() const;
 
     int getVida() const;
 
+    bool getSaltando() const;
+
+    bool getAgachado() const;
+
     bool getTieneBalon() const;
+
     void setTieneBalon(bool valor);
 };
 
