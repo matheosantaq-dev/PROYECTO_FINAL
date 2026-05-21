@@ -1,8 +1,11 @@
+
+
 #ifndef ESCENAJUEGO_H
 #define ESCENAJUEGO_H
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
+
 #include <QGraphicsPixmapItem>
 #include <QGraphicsTextItem>
 #include <QGraphicsRectItem>
@@ -13,7 +16,7 @@
 #include <QMediaPlayer>
 #include <QAudioOutput>
 
-#include "NivelBoss.h"
+#include "GameManager.h"
 
 class EscenaJuego : public QGraphicsView
 {
@@ -21,38 +24,32 @@ class EscenaJuego : public QGraphicsView
 
 private:
 
-    // Escena principal
     QGraphicsScene* escena;
 
-    // Nivel actual
-    NivelBoss* nivel;
+    GameManager* gameManager;
 
-    // Timer del juego
+    Nivel* nivelActual;
+
     QTimer* timer;
 
-    // Sprites
     QGraphicsPixmapItem* spriteJugador;
 
     QGraphicsPixmapItem* spriteBoss;
 
-    // HUD
     QGraphicsTextItem* textoVida;
 
     QGraphicsTextItem* textoPuntos;
 
     QGraphicsTextItem* textoTiempo;
 
-    // Barra de vida
     QGraphicsRectItem* barraVidaFondo;
 
     QGraphicsRectItem* barraVida;
 
-    // Sonido
     QMediaPlayer* musica;
 
     QAudioOutput* audio;
 
-    // Animaciones
     QPixmap spriteSheetJugador;
 
     int frameJugador;
@@ -61,11 +58,19 @@ public:
 
     EscenaJuego(QWidget* parent = nullptr);
 
+    ~EscenaJuego();
+
     void actualizarJuego();
 
 protected:
 
-    void keyPressEvent(QKeyEvent* event) override;
+    void keyPressEvent(
+        QKeyEvent* event
+    ) override;
+
+    void keyReleaseEvent(
+        QKeyEvent* event
+    ) override;
 };
 
 #endif
