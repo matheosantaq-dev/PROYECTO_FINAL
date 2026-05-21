@@ -1,3 +1,7 @@
+// =========================
+// EscenaJuego.cpp
+// =========================
+
 #include "EscenaJuego.h"
 
 #include <QPixmap>
@@ -7,85 +11,66 @@
 EscenaJuego::EscenaJuego(QWidget* parent)
     : QGraphicsView(parent)
 {
-    // Crear escena
     escena = new QGraphicsScene(this);
 
-    escena->setSceneRect(0, 0, 1200, 800);
+    escena->setSceneRect(0,0,1200,800);
 
     setScene(escena);
 
-    // Crear nivel
-    nivel = new NivelBoss();
+    gameManager = new GameManager();
 
-    // Fondo temporal
+    gameManager->iniciarJuego();
+
+    nivelActual =
+        gameManager->getNivelActual();
+
     setBackgroundBrush(
         QBrush(Qt::darkGreen)
     );
 
-    // SPRITE JUGADOR
-
-
     spriteJugador =
         escena->addPixmap(
-            QPixmap()
+            QPixmap(80,80)
         );
 
-    // Rectángulo temporal
-    spriteJugador->setPixmap(
-        QPixmap(80,80)
-    );
-
     spriteJugador->setPos(
-        nivel->getJugador()->getX(),
-        nivel->getJugador()->getY()
+        nivelActual->getJugador()->getX(),
+        nivelActual->getJugador()->getY()
     );
-
-
-    // SPRITE BOSS
-
 
     spriteBoss =
         escena->addPixmap(
-            QPixmap()
+            QPixmap(120,120)
         );
 
-    spriteBoss->setPixmap(
-        QPixmap(120,120)
-    );
-
-    spriteBoss->setPos(
-        nivel->getJefe()->getX(),
-        nivel->getJefe()->getY()
-    );
-
-    // HUD
-
+    spriteBoss->hide();
 
     textoVida =
         escena->addText("");
 
-    textoVida->setDefaultTextColor(Qt::white);
+    textoVida->setDefaultTextColor(
+        Qt::white
+    );
 
     textoVida->setPos(20,20);
-
 
     textoPuntos =
         escena->addText("");
 
-    textoPuntos->setDefaultTextColor(Qt::yellow);
+    textoPuntos->setDefaultTextColor(
+        Qt::yellow
+    );
 
     textoPuntos->setPos(20,60);
-
 
     textoTiempo =
         escena->addText("");
 
-    textoTiempo->setDefaultTextColor(Qt::red);
+    textoTiempo->setDefaultTextColor(
+        Qt::red
+    );
 
     textoTiempo->setPos(20,100);
-
-
-    // BARRA VIDA
 
     barraVidaFondo =
         escena->addRect(
@@ -95,7 +80,9 @@ EscenaJuego::EscenaJuego(QWidget* parent)
             30
         );
 
-    barraVidaFondo->setBrush(Qt::black);
+    barraVidaFondo->setBrush(
+        Qt::black
+    );
 
     barraVida =
         escena->addRect(
@@ -105,10 +92,13 @@ EscenaJuego::EscenaJuego(QWidget* parent)
             30
         );
 
-    barraVida->setBrush(Qt::red);
+    barraVida->setBrush(
+        Qt::red
+    );
 
-    // TIMER
+    barraVida->hide();
 
+    barraVidaFondo->hide();
 
     timer = new QTimer(this);
 
@@ -118,110 +108,146 @@ EscenaJuego::EscenaJuego(QWidget* parent)
             &EscenaJuego::actualizarJuego);
 
     timer->start(16);
+}
 
-    // FPS aprox 60
+EscenaJuego::~EscenaJuego()
+{
+    delete gameManager;
 }
 
 void EscenaJuego::actualizarJuego()
 {
-    // Actualizar lógica
-    nivel->actualizar();
+    gameManager->actualizar();
 
-  
-    // ACTUALIZAR POSICIONES
+    nivelActual =
+        gameManager->getNivelActual();
 
+    if(gameManager->estaTerminado())
+    {
+        timer->stop();
+
+        textoTiempo->setPlainText(
+            "GANASTE"
+        );
+
+        return;
+    }
 
     spriteJugador->setPos(
-        nivel->getJugador()->getX(),
-        nivel->getJugador()->getY()
+        nivelActual->getJugador()->getX(),
+        nivelActual->getJugador()->getY()
     );
 
-    spriteBoss->setPos(
-        nivel->getJefe()->getX(),
-        nivel->getJefe()->getY()
-    );
-
-
-    // ACTUALIZAR HUD
-
-    textoVida->setPlainText(
-        "Vida Boss: "
-        + QString::number(
-            nivel->getJefe()->getVida()
-        )
-    );
-
-    textoPuntos->setPlainText(
-        "Puntos: "
-        + QString::number(
-            nivel->getPuntaje()
-        )
-    );
-
-    textoTiempo->setPlainText(
-        "Tiempo: "
-        + QString::number(
-            nivel->getTiempo()
-        )
-    );
-
-    // ACTUALIZAR BARRA VIDA
-
-
-    float vida =
-        nivel->getJefe()->getVida();
-
-    float ancho =
-        (vida / 400.0) * 300;
-
-    barraVida->setRect(
-        800,
-        20,
-        ancho,
-        30
-    );
-
-
-    // MODO FURIA VISUAL
-
-
-    if(nivel->getTiempo() >= 30)
-    {
-        spriteBoss->setScale(1.5);
-
-        barraVida->setBrush(
-            Qt::darkRed
+    NivelBoss* bossNivel =
+        dynamic_cast<NivelBoss*>(
+            nivelActual
         );
+
+    if(bossNivel != nullptr)
+    {
+        spriteBoss->show();
+
+        barraVida->show();
+
+        barraVidaFondo->show();
+
+        spriteBoss->setPos(
+            bossNivel->getJefe()->getX(),
+            bossNivel->getJefe()->getY()
+        );
+
+        textoVida->setPlainText(
+            "Vida Boss: "
+            + QString::number(
+                bossNivel->getJefe()->getVida()
+            )
+        );
+
+        textoPuntos->setPlainText(
+            "Puntos: "
+            + QString::number(
+                bossNivel->getPuntaje()
+            )
+        );
+
+        textoTiempo->setPlainText(
+            "Tiempo: "
+            + QString::number(
+                bossNivel->getTiempo()
+            )
+        );
+
+        float vida =
+            bossNivel->getJefe()->getVida();
+
+        float ancho =
+            (vida / 400.0f) * 300;
+
+        barraVida->setRect(
+            800,
+            20,
+            ancho,
+            30
+        );
+
+        if(bossNivel->getTiempo() >= 30)
+        {
+            spriteBoss->setScale(1.5);
+
+            barraVida->setBrush(
+                Qt::darkRed
+            );
+        }
+    }
+    else
+    {
+        spriteBoss->hide();
+
+        barraVida->hide();
+
+        barraVidaFondo->hide();
     }
 }
 
-void EscenaJuego::keyPressEvent(QKeyEvent* event)
+void EscenaJuego::keyPressEvent(
+        QKeyEvent* event)
 {
-
-    // MOVIMIENTO
-
+    if(nivelActual == nullptr)
+    {
+        return;
+    }
 
     if(event->key() == Qt::Key_A)
     {
-        nivel->getJugador()->moverIzquierda();
+        nivelActual->getJugador()
+                ->moverIzquierda();
     }
 
     if(event->key() == Qt::Key_D)
     {
-        nivel->getJugador()->moverDerecha();
+        nivelActual->getJugador()
+                ->moverDerecha();
     }
 
     if(event->key() == Qt::Key_W)
     {
-        nivel->getJugador()->saltar();
+        nivelActual->getJugador()
+                ->saltar();
     }
-
-  
-    // ATAQUE
-
 
     if(event->key() == Qt::Key_Space)
     {
-        nivel->lanzarBalon();
+        nivelActual->lanzarBalon();
+    }
+}
+
+void EscenaJuego::keyReleaseEvent(
+        QKeyEvent* event)
+{
+    if(event->key() == Qt::Key_A
+        || event->key() == Qt::Key_D)
+    {
+        nivelActual->getJugador()
+                ->detener();
     }
 }
