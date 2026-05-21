@@ -1,3 +1,5 @@
+
+
 #ifndef NIVEL_H
 #define NIVEL_H
 
@@ -26,11 +28,14 @@ public:
 
     virtual void cargarNivel() = 0;
 
+    virtual void lanzarBalon();
+
     bool estaTerminado() const;
 
     Jugador* getJugador() const;
 
-    std::vector<Enemigo*>& getEnemigos();
+    std::vector<Enemigo*>&
+    getEnemigos();
 };
 
 #endif
