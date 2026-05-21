@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QKeyEvent>
 
-#include "../logica/NivelBoss.h"
+#include "NivelBoss.h"
 
 class EscenaJuego : public QGraphicsView
 {
