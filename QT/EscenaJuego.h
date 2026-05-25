@@ -13,8 +13,7 @@
 #include <QTimer>
 #include <QKeyEvent>
 
-#include <QMediaPlayer>
-#include <QAudioOutput>
+#include <QPixmap>
 
 #include "GameManager.h"
 
@@ -24,17 +23,36 @@ class EscenaJuego : public QGraphicsView
 
 private:
 
+
+    // ESCENA
+
+
     QGraphicsScene* escena;
+
+
+    // GAME MANAGER
+
 
     GameManager* gameManager;
 
     Nivel* nivelActual;
 
+
+    // TIMER PRINCIPAL
+
+
     QTimer* timer;
+
+
+    // SPRITES
 
     QGraphicsPixmapItem* spriteJugador;
 
     QGraphicsPixmapItem* spriteBoss;
+
+
+    // HUD
+
 
     QGraphicsTextItem* textoVida;
 
@@ -42,17 +60,28 @@ private:
 
     QGraphicsTextItem* textoTiempo;
 
+   
+    // BARRA VIDA
+
+
     QGraphicsRectItem* barraVidaFondo;
 
     QGraphicsRectItem* barraVida;
 
-    QMediaPlayer* musica;
-
-    QAudioOutput* audio;
+  
+    // SPRITESHEET JUGADOR
+    
 
     QPixmap spriteSheetJugador;
 
+    // Frame actual
     int frameJugador;
+
+    // Tiempo animación
+    int contadorAnimacion;
+
+    // Dirección
+    bool mirandoDerecha;
 
 public:
 
@@ -62,15 +91,17 @@ public:
 
     void actualizarJuego();
 
+    void actualizarAnimacionJugador();
+
 protected:
 
     void keyPressEvent(
         QKeyEvent* event
-    ) override;
+        ) override;
 
     void keyReleaseEvent(
         QKeyEvent* event
-    ) override;
+        ) override;
 };
 
 #endif
