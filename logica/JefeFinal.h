@@ -24,6 +24,9 @@ public:
     int getFase() const;
 
     int getTiempoAtaque() const;
+
+
+    void setVida(int nuevaVida);
 };
 
 #endif
