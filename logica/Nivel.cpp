@@ -32,4 +32,9 @@ Jugador* Nivel::getJugador() const
 std::vector<Enemigo*>& Nivel::getEnemigos()
 {
     return enemigos;
+    
+}
+void Nivel::lanzarBalon()
+{
+
 }
