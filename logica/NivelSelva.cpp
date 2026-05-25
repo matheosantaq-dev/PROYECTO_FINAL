@@ -15,92 +15,84 @@ NivelSelva::NivelSelva()
 
 void NivelSelva::cargarNivel()
 {
+    jugador = new Jugador(
+        100,
+        620
+        );
 
-    // JUGADOR
- 
-
-    jugador = new Jugador(100, 620);
-
-    // ENEMIGOS
-
+    // enemigos más lejos
     enemigos.push_back(
-        new Enemigo(500, 620)
+        new Enemigo(
+            800,
+            620
+            )
         );
 
     enemigos.push_back(
-        new Enemigo(900, 620)
+        new Enemigo(
+            1200,
+            620
+            )
         );
 
     enemigos.push_back(
-        new Enemigo(1300, 620)
+        new Enemigo(
+            1600,
+            620
+            )
         );
 }
 
 void NivelSelva::actualizar()
 {
-    
-    // ACTUALIZAR JUGADOR
-  
-
     jugador->actualizar();
-
-
-    // ACTUALIZAR ENEMIGOS
-
 
     for(Enemigo* enemigo : enemigos)
     {
         enemigo->actualizar();
 
-        // COLISION BASICA
-     
-
+        // colisión MUCHO más pequeña
         float dx =
             jugador->getX()
-            - enemigo->getX();
+            -
+            enemigo->getX();
 
         float dy =
             jugador->getY()
-            - enemigo->getY();
+            -
+            enemigo->getY();
 
-        if(dx < 60 && dx > -60
-            && dy < 60 && dy > -60)
+        if(
+           dx<25 && dx>-25 &&
+           dy<25 && dy>-25
+           )
         {
-            jugador->recibirDanio(1);
+            jugador->recibirDanio(
+                1
+                );
         }
     }
-
-    // DISTANCIA
-
 
     distanciaRecorrida =
         jugador->getX();
 
-    // PUNTOS
-
-
     puntos =
-        distanciaRecorrida / 10;
-
-    // TIEMPO
-
+        distanciaRecorrida/10;
 
     tiempoNivel++;
 
-    // DERROTA
- 
-
-    if(!jugador->estaVivo())
+    if(
+       !jugador->estaVivo()
+       )
     {
-        terminado = true;
+        terminado=true;
     }
 
-    // FINAL NIVEL
-
-
-    if(distanciaRecorrida >= 1500)
+    if(
+       distanciaRecorrida>=1500
+       )
     {
-        terminado = true;
+        terminado=true;
     }
 }
 
@@ -111,7 +103,7 @@ int NivelSelva::getDistancia() const
 
 int NivelSelva::getTiempo() const
 {
-    return tiempoNivel / 60;
+    return tiempoNivel/60;
 }
 
 int NivelSelva::getPuntos() const
