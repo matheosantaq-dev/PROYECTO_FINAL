@@ -1,3 +1,5 @@
+
+
 #include "JefeFinal.h"
 
 JefeFinal::JefeFinal(float x, float y)
@@ -12,6 +14,8 @@ JefeFinal::JefeFinal(float x, float y)
     velocidadAtaque = 1.0;
 
     tiempoAtaque = 0;
+
+    velocidadX = velocidadMovimiento;
 }
 
 void JefeFinal::actualizar()
@@ -20,7 +24,7 @@ void JefeFinal::actualizar()
 
     tiempoAtaque++;
 
-    // Movimiento lateral del jefe
+    // Movimiento lateral
     if(x <= 100)
     {
         velocidadX = velocidadMovimiento;
@@ -31,7 +35,7 @@ void JefeFinal::actualizar()
         velocidadX = -velocidadMovimiento;
     }
 
-    // Cambio de fase según vida
+    // Cambio de fase
     if(vida <= 100 && fase == 1)
     {
         cambiarFase();
@@ -56,3 +60,9 @@ int JefeFinal::getTiempoAtaque() const
 {
     return tiempoAtaque;
 }
+
+void JefeFinal::setVida(int nuevaVida)
+{
+    vida = nuevaVida;
+}
+
