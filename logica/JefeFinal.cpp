@@ -69,5 +69,9 @@ int JefeFinal::getTiempoAtaque() const
 void JefeFinal::setVida(int nuevaVida)
 {
     vida = nuevaVida;
-}
 
+    if(vida < 0)
+    {
+        vida = 0;
+    }
+}
