@@ -52,6 +52,11 @@ private:
 
     QGraphicsPixmapItem* spriteBoss;
 
+    QPixmap spriteSheetProyectiles;
+
+    QGraphicsPixmapItem* spriteBalon;
+
+    QGraphicsPixmapItem* spriteDardo;
 
     // HUD
 
