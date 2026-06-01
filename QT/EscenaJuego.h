@@ -52,7 +52,6 @@ private:
 
     QGraphicsPixmapItem* spriteBoss;
 
-    QPixmap spriteSheetProyectiles;
 
     // HUD
 
