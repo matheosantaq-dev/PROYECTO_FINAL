@@ -398,6 +398,11 @@ void EscenaJuego::keyPressEvent(
     QKeyEvent* event
     )
 {
+    if(nivelActual == nullptr)
+    {
+        return;
+    }
+
     if(event->key()==Qt::Key_A)
     {
         nivelActual
