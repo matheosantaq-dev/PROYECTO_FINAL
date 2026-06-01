@@ -54,10 +54,6 @@ private:
 
     QPixmap spriteSheetProyectiles;
 
-    QGraphicsPixmapItem* spriteBalon;
-
-    QGraphicsPixmapItem* spriteDardo;
-
     // HUD
 
 
