@@ -38,7 +38,3 @@ Nivel::getEnemigos() const
     return enemigos;
     
 }
-void Nivel::lanzarBalon()
-{
-
-}
