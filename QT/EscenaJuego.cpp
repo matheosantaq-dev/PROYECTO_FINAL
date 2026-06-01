@@ -116,11 +116,6 @@ EscenaJuego::EscenaJuego(QWidget* parent)
             64
             );
 
-    spriteBalon=
-        escena->addPixmap(
-            frameBalon
-            );
-
     spriteBalon->hide();
 
     spriteBalon->setScale(
@@ -135,11 +130,6 @@ EscenaJuego::EscenaJuego(QWidget* parent)
             320,
             64,
             64
-            );
-
-    spriteDardo=
-        escena->addPixmap(
-            frameDardo
             );
 
     spriteDardo->hide();
