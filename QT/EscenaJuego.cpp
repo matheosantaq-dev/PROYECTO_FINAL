@@ -267,6 +267,16 @@ EscenaJuego::EscenaJuego(QWidget* parent)
 
 EscenaJuego::~EscenaJuego()
 {
+    for(QGraphicsPixmapItem* sprite : spritesBalones)
+    {
+        delete sprite;
+    }
+
+    for(QGraphicsPixmapItem* sprite : spritesDardos)
+    {
+        delete sprite;
+    }
+    
     delete gameManager;
 }
 
@@ -339,44 +349,90 @@ void EscenaJuego::actualizarJuego()
             nivelActual
             );
 
+    QPixmap frameBalon =
+        spriteSheetProyectiles.copy(
+            0,
+            0,
+            64,
+            64
+            );
+
+    QPixmap frameDardo =
+        spriteSheetProyectiles.copy(
+            0,
+            320,
+            64,
+            64
+            );
+
     if(bossNivel!=nullptr)
     {
-        if(!bossNivel->getBalones().empty())
+        while(
+            spritesBalones.size()
+            <
+            bossNivel->getBalones().size()
+        )
         {
-            Balon* b=
-                bossNivel->getBalones()[0];
-
-            spriteBalon->show();
-
-            spriteBalon->setPos(
-                b->getX(),
-                b->getY()
+            QGraphicsPixmapItem* nuevoSprite =
+                escena->addPixmap(frameBalon);
+        
+            spritesBalones.push_back(
+                nuevoSprite
                 );
         }
-
-        else
+        
+        for(size_t i = 0;
+            i < spritesBalones.size();
+            i++)
         {
-            spriteBalon->hide();
+            if(i < bossNivel->getBalones().size())
+            {
+                spritesBalones[i]->show();
+        
+                spritesBalones[i]->setPos(
+                    bossNivel->getBalones()[i]->getX(),
+                    bossNivel->getBalones()[i]->getY()
+                    );
+            }
+            else
+            {
+                spritesBalones[i]->hide();
+            }
         }
 
-        if(!bossNivel->getDardos().empty())
+        while(
+            spritesDardos.size()
+            <
+            bossNivel->getDardos().size()
+        )
         {
-            Dardo* d=
-                bossNivel->getDardos()[0];
-
-            spriteDardo->show();
-
-            spriteDardo->setPos(
-                d->getX(),
-                d->getY()
+            QGraphicsPixmapItem* nuevoSprite =
+                escena->addPixmap(frameDardo);
+        
+            spritesDardos.push_back(
+                nuevoSprite
                 );
         }
-
-        else
+        
+        for(size_t i = 0;
+            i < spritesDardos.size();
+            i++)
         {
-            spriteDardo->hide();
+            if(i < bossNivel->getDardos().size())
+            {
+                spritesDardos[i]->show();
+        
+                spritesDardos[i]->setPos(
+                    bossNivel->getDardos()[i]->getX(),
+                    bossNivel->getDardos()[i]->getY()
+                    );
+            }
+            else
+            {
+                spritesDardos[i]->hide();
+            }
         }
-
+        
         spriteBoss->show();
 
         barraVida->show();
