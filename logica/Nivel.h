@@ -34,8 +34,8 @@ public:
 
     Jugador* getJugador() const;
 
-    std::vector<Enemigo*>&
-    getEnemigos();
+    const std::vector<Enemigo*>&
+    getEnemigos() const;
 };
 
 #endif
