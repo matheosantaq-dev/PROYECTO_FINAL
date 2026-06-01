@@ -87,6 +87,7 @@ void Jugador::actualizar()
 
 void Jugador::moverIzquierda()
 {
+    mirandoDerecha = false;
     velocidadX -= 1.0f;
 
     if(velocidadX < -5.0f)
