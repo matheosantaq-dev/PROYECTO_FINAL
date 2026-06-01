@@ -45,6 +45,7 @@ void GameManager::cambiarNivel()
 {
     delete nivelActual;
 
+    nivelActual = nullptr;
     // PASAR A NIVEL 2
 
 
