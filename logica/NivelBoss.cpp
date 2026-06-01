@@ -205,8 +205,13 @@ void NivelBoss::lanzarBalon()
 {
     Balon* nuevoBalon;
 
+    float offsetX =
+        jugador->estaMirandoDerecha()
+        ? 40.0f
+        : -40.0f;
+
     nuevoBalon = new Balon(
-        jugador->getX(),
+        jugador->getX() + offsetX,
         jugador->getY()
     );
 
