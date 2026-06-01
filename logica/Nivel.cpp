@@ -15,7 +15,10 @@ Nivel::~Nivel()
     {
         delete enemigo;
     }
-
+    for(Enemigo*& enemigo : enemigos)
+    {
+        enemigo = nullptr;
+    }
     enemigos.clear();
 }
 
