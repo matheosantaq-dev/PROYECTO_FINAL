@@ -167,6 +167,11 @@ bool Jugador::getTieneBalon() const
     return tieneBalon;
 }
 
+bool Jugador::estaMirandoDerecha() const
+{
+    return mirandoDerecha;
+}
+
 void Jugador::setTieneBalon(bool valor)
 {
     tieneBalon = valor;
