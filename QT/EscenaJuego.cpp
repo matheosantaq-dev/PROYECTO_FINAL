@@ -292,6 +292,13 @@ void EscenaJuego::actualizarJuego()
     nivelActual=
         gameManager->getNivelActual();
 
+    if(nivelActual == nullptr)
+    {
+        timer->stop();
+    
+        return;
+    }
+    
     actualizarAnimacionJugador();
 
     spriteJugador->setPos(
