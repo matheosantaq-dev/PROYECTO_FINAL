@@ -210,9 +210,15 @@ void NivelBoss::lanzarBalon()
         ? 40.0f
         : -40.0f;
 
+    float velocidadBalon =
+        jugador->estaMirandoDerecha()
+        ? 8.0f
+        : -8.0f;
+    
     nuevoBalon = new Balon(
         jugador->getX() + offsetX,
-        jugador->getY()
+        jugador->getY(),
+        velocidadBalon
     );
 
     balones.push_back(nuevoBalon);
