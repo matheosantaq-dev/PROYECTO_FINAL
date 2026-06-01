@@ -16,8 +16,15 @@ GameManager::~GameManager()
 
 void GameManager::iniciarJuego()
 {
-    // Iniciar nivel 1
+    delete nivelActual;
+
+    nivelActual = nullptr;
+
     nivelActual = new NivelSelva();
+
+    numeroNivel = 1;
+
+    juegoTerminado = false;
 }
 
 void GameManager::actualizar()
