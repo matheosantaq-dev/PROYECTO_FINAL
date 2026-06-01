@@ -10,7 +10,7 @@ Nivel::Nivel()
 Nivel::~Nivel()
 {
     delete jugador;
-
+    jugador = nullptr;
     for(Enemigo* enemigo : enemigos)
     {
         delete enemigo;
