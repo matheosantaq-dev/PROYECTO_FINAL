@@ -178,8 +178,22 @@ void NivelBoss::actualizar()
         terminado = true;
     }
 
-    if(!jugador->estaVivo())
+    if(!jefe->estaVivo())
     {
+        for(Balon* balon : balones)
+        {
+            delete balon;
+        }
+    
+        balones.clear();
+    
+        for(Dardo* dardo : dardos)
+        {
+            delete dardo;
+        }
+    
+        dardos.clear();
+    
         terminado = true;
     }
 }
