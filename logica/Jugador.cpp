@@ -97,6 +97,7 @@ void Jugador::moverIzquierda()
 
 void Jugador::moverDerecha()
 {
+    mirandoDerecha = true;
     velocidadX += 1.0f;
 
     if(velocidadX > 5.0f)
