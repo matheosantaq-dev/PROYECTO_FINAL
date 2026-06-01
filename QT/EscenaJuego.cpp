@@ -89,11 +89,15 @@ EscenaJuego::EscenaJuego(QWidget* parent)
     // BOSS
     // =====================
 
+    QPixmap bossPixmap(
+        ":/Recursos/fondos/boss.png"
+        );
+    
     spriteBoss=
         escena->addPixmap(
-            QPixmap(120,120)
+            bossPixmap
             );
-
+    
     spriteBoss->hide();
 
 
@@ -319,6 +323,19 @@ void EscenaJuego::actualizarJuego()
 
     if(bossNivel!=nullptr)
     {
+        int vidaBoss =
+            bossNivel->getJefe()->getVida();
+        
+        int anchoBarra =
+            (vidaBoss * 300) / 200;
+
+        barraVida->setRect(
+            800,
+            20,
+            anchoBarra,
+            30
+            );
+        
         while(
             spritesBalones.size()
             <
@@ -384,6 +401,11 @@ void EscenaJuego::actualizarJuego()
                 spritesDardos[i]->hide();
             }
         }
+
+        spriteBoss->setPos(
+            bossNivel->getJefe()->getX(),
+            bossNivel->getJefe()->getY()
+            );
         
         spriteBoss->show();
 
