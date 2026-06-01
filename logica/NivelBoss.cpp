@@ -69,7 +69,10 @@ void NivelBoss::actualizar()
 
         jefe->setVelocidadX(12);
 
-        jefe->setVida(400);
+        if(jefe->getVida() > 400)
+        {
+            jefe->setVida(400);
+        }
     }
 
     for(Dardo* dardo : dardos)
