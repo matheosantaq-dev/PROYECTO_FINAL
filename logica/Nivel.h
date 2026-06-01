@@ -28,7 +28,7 @@ public:
 
     virtual void cargarNivel() = 0;
 
-    virtual void lanzarBalon();
+    virtual void lanzarBalon() = 0;
 
     bool estaTerminado() const;
 
