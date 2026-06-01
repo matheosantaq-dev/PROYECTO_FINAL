@@ -17,6 +17,8 @@ private:
 
     bool tieneBalon;
 
+    bool mirandoDerecha;
+
     float gravedad;
 
     float fuerzaSalto;
