@@ -27,8 +27,32 @@ void Jugador::mover()
 
 void Jugador::actualizar()
 {
+    if(velocidadX > 0)
+    {
+        velocidadX -= 0.2f;
+    
+        if(velocidadX < 0)
+        {
+            velocidadX = 0;
+        }
+    }
+
+    if(velocidadX < 0)
+    {
+        velocidadX += 0.2f;
+    
+        if(velocidadX > 0)
+        {
+            velocidadX = 0;
+        }
+    }
     velocidadY += gravedad;
 
+    if(velocidadY < -20)
+    {
+        velocidadY = -20;
+    }
+    
     mover();
 
     if(x < 0)
@@ -53,12 +77,22 @@ void Jugador::actualizar()
 
 void Jugador::moverIzquierda()
 {
-    velocidadX = -5;
+    velocidadX -= 1.0f;
+
+    if(velocidadX < -5.0f)
+    {
+        velocidadX = -5.0f;
+    }
 }
 
 void Jugador::moverDerecha()
 {
-    velocidadX = 5;
+    velocidadX += 1.0f;
+
+    if(velocidadX > 5.0f)
+    {
+        velocidadX = 5.0f;
+    }
 }
 
 void Jugador::detener()
