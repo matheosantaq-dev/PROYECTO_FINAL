@@ -55,6 +55,8 @@ public:
 
     bool getTieneBalon() const;
 
+    bool estaMirandoDerecha() const;
+
     void setTieneBalon(bool valor);
 };
 
