@@ -420,6 +420,16 @@ void EscenaJuego::actualizarJuego()
 
     else
     {
+        for(QGraphicsPixmapItem* sprite : spritesBalones)
+        {
+            sprite->hide();
+        }
+        
+        for(QGraphicsPixmapItem* sprite : spritesDardos)
+        {
+            sprite->hide();
+        }
+        
         spriteBoss->hide();
 
         barraVida->hide();
