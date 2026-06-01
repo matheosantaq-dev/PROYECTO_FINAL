@@ -20,6 +20,11 @@ JefeFinal::JefeFinal(float x, float y)
 
 void JefeFinal::actualizar()
 {
+    if(!estaVivo())
+    {
+        return;
+    }
+    
     mover();
 
     tiempoAtaque++;
