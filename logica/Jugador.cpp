@@ -11,6 +11,8 @@ Jugador::Jugador(float x, float y)
 
     tieneBalon = false;
 
+    mirandoDerecha = true;
+
     gravedad = 0.5f;
 
     fuerzaSalto = -12.0f;
