@@ -13,6 +13,8 @@ NivelBoss::NivelBoss()
 
     modoFuria = false;
 
+    ultimoTiempoAtaque = -1;
+
     cargarNivel();
 }
 
