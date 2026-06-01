@@ -272,17 +272,35 @@ EscenaJuego::~EscenaJuego()
 
 void EscenaJuego::actualizarAnimacionJugador()
 {
-    QPixmap frame=
+    contadorAnimacion++;
+
+    if(contadorAnimacion >= 8)
+    {
+        contadorAnimacion = 0;
+
+        frameJugador++;
+
+        if(frameJugador > 3)
+        {
+            frameJugador = 0;
+        }
+    }
+
+    int xFrame =
+        70 +
+        (frameJugador * 180);
+
+    QPixmap frame =
         spriteSheetJugador.copy(
-            70,
+            xFrame,
             500,
             180,
             220
-            );
+        );
 
     spriteJugador->setPixmap(
         frame
-        );
+    );
 }
 
 void EscenaJuego::actualizarJuego()
