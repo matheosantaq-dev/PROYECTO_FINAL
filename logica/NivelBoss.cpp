@@ -82,9 +82,19 @@ void NivelBoss::actualizar()
         balon->actualizar();
     }
 
-    if(jefe->getTiempoAtaque() % 120 == 0)
+    int tiempoAtaque =
+        jefe->getTiempoAtaque();
+    
+    if(
+        tiempoAtaque % 120 == 0
+        &&
+        tiempoAtaque != ultimoTiempoAtaque
+    )
     {
         lanzarDardo();
+    
+        ultimoTiempoAtaque =
+            tiempoAtaque;
     }
 
     for(Balon* balon : balones)
