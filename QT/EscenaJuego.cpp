@@ -327,22 +327,6 @@ void EscenaJuego::actualizarJuego()
             nivelActual
             );
 
-    QPixmap frameBalon =
-        spriteSheetProyectiles.copy(
-            0,
-            0,
-            64,
-            64
-            );
-
-    QPixmap frameDardo =
-        spriteSheetProyectiles.copy(
-            0,
-            320,
-            64,
-            64
-            );
-
     if(bossNivel!=nullptr)
     {
         while(
@@ -480,9 +464,9 @@ void EscenaJuego::keyReleaseEvent(
     )
 {
     if(nivelActual == nullptr)
-{
-    return;
-}
+    {
+        return;
+    }
     if(
         event->key()==Qt::Key_A
         ||
