@@ -116,12 +116,6 @@ EscenaJuego::EscenaJuego(QWidget* parent)
             64
             );
 
-    spriteBalon->hide();
-
-    spriteBalon->setScale(
-        1.0
-        );
-
     // DARDO
 
     QPixmap frameDardo=
@@ -131,12 +125,6 @@ EscenaJuego::EscenaJuego(QWidget* parent)
             64,
             64
             );
-
-    spriteDardo->hide();
-
-    spriteDardo->setScale(
-        1.0
-        );
 
     // =====================
     // HUD
