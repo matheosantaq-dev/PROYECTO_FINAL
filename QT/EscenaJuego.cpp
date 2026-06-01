@@ -105,7 +105,23 @@ EscenaJuego::EscenaJuego(QWidget* parent)
         QPixmap(
             ":/Recursos/fondos/PROYECTILES.png"
             );
+    
+    frameBalon =
+        spriteSheetProyectiles.copy(
+            0,
+            0,
+            64,
+            64
+            );
 
+    frameDardo =
+        spriteSheetProyectiles.copy(
+            0,
+            320,
+            64,
+            64
+            );
+    
     // BALON
 
     QPixmap frameBalon=
