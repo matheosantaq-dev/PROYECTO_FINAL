@@ -106,25 +106,9 @@ EscenaJuego::EscenaJuego(QWidget* parent)
             ":/Recursos/fondos/PROYECTILES.png"
             );
     
-    frameBalon =
-        spriteSheetProyectiles.copy(
-            0,
-            0,
-            64,
-            64
-            );
-
-    frameDardo =
-        spriteSheetProyectiles.copy(
-            0,
-            320,
-            64,
-            64
-            );
-    
     // BALON
 
-    QPixmap frameBalon=
+    frameBalon =
         spriteSheetProyectiles.copy(
             0,
             0,
@@ -134,14 +118,14 @@ EscenaJuego::EscenaJuego(QWidget* parent)
 
     // DARDO
 
-    QPixmap frameDardo=
+    frameDardo =
         spriteSheetProyectiles.copy(
             0,
             320,
             64,
             64
             );
-
+    
     // =====================
     // HUD
     // =====================
@@ -261,16 +245,6 @@ EscenaJuego::EscenaJuego(QWidget* parent)
 
 EscenaJuego::~EscenaJuego()
 {
-    for(QGraphicsPixmapItem* sprite : spritesBalones)
-    {
-        delete sprite;
-    }
-
-    for(QGraphicsPixmapItem* sprite : spritesDardos)
-    {
-        delete sprite;
-    }
-    
     delete gameManager;
 }
 
