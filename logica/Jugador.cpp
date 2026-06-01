@@ -1,5 +1,3 @@
-
-
 #include "Jugador.h"
 
 Jugador::Jugador(float x, float y)
@@ -16,6 +14,16 @@ Jugador::Jugador(float x, float y)
     gravedad = 0.5f;
 
     fuerzaSalto = -12.0f;
+}
+
+void Jugador::curar(int cantidad)
+{
+    vida += cantidad;
+
+    if(vida > 100)
+    {
+        vida = 100;
+    }
 }
 
 void Jugador::mover()
