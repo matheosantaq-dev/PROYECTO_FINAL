@@ -435,6 +435,10 @@ void EscenaJuego::keyReleaseEvent(
     QKeyEvent* event
     )
 {
+    if(nivelActual == nullptr)
+{
+    return;
+}
     if(
         event->key()==Qt::Key_A
         ||
