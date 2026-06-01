@@ -1,11 +1,18 @@
 #include "Balon.h"
 
-Balon::Balon(float x, float y)
-    : Proyectil(x, y, 0, -8)
+Balon::Balon(
+    float x,
+    float y,
+    float velocidadX
+)
+    : Proyectil(
+        x,
+        y,
+        velocidadX,
+        -8
+    )
 {
-
 }
-
 void Balon::actualizar()
 {
     mover();
