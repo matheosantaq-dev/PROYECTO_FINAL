@@ -74,8 +74,15 @@ private:
   
     // SPRITESHEET JUGADOR
     
-
     QPixmap spriteSheetJugador;
+    
+    // SPRITESHEET PROYECTILES
+    
+    QPixmap spriteSheetProyectiles;
+    
+    QPixmap frameBalon;
+    
+    QPixmap frameDardo;
 
     // Frame actual
     int frameJugador;
