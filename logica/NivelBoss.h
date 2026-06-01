@@ -35,6 +35,8 @@ private:
 
     bool modoFuria;
 
+    int ultimoTiempoAtaque;
+
 public:
 
     NivelBoss();
