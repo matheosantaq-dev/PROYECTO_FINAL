@@ -37,7 +37,9 @@ private:
 
     Nivel* nivelActual;
 
+    std::vector<QGraphicsPixmapItem*> spritesBalones;
 
+    std::vector<QGraphicsPixmapItem*> spritesDardos;
     // TIMER PRINCIPAL
 
 
