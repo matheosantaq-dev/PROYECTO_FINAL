@@ -34,11 +34,15 @@ void AgenteIA::actualizarIA()
     // Boss sigue al jugador
     if(jugador->getX() < jefe->getX())
     {
-        jefe->setX(jefe->getX() - velocidadIA);
+        jefe->setVelocidadX(
+            -velocidadIA
+        );
     }
 
     if(jugador->getX() > jefe->getX())
     {
-        jefe->setX(jefe->getX() + velocidadIA);
+        jefe->setVelocidadX(
+            velocidadIA
+        );
     }
 }
