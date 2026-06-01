@@ -7,7 +7,11 @@ class Balon : public Proyectil
 {
 public:
 
-    Balon(float x, float y);
+    Balon(
+        float x,
+        float y,
+        float velocidadX
+    );
 
     void actualizar() override;
 };
