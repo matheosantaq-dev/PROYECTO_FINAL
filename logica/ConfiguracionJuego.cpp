@@ -1,28 +1,29 @@
 #include "ConfiguracionJuego.h"
 
 ConfiguracionJuego::ConfiguracionJuego()
-{
-    nombreJugador = "Jugador";
+    : nombreJugador("Jugador"), dificultad(INTERMEDIO)
+{}
 
-    dificultad = INTERMEDIO;
-}
-
-void ConfiguracionJuego::setNombreJugador(QString nombre)
+void ConfiguracionJuego::setNombreJugador(const QString& nombre)
 {
     nombreJugador = nombre;
 }
 
-QString ConfiguracionJuego::getNombreJugador() const
+void ConfiguracionJuego::setDificultad(Dificultad d)
 {
-    return nombreJugador;
+    dificultad = d;
 }
 
-void ConfiguracionJuego::setDificultad(Dificultad dificultad)
-{
-    this->dificultad = dificultad;
-}
+QString    ConfiguracionJuego::getNombreJugador() const { return nombreJugador; }
+Dificultad ConfiguracionJuego::getDificultad()    const { return dificultad; }
 
-Dificultad ConfiguracionJuego::getDificultad() const
+int ConfiguracionJuego::getDificultadInt() const
 {
-    return dificultad;
+    switch (dificultad)
+    {
+    case FACIL:      return 0;
+    case INTERMEDIO: return 1;
+    case DIFICIL:    return 2;
+    default:         return 1;
+    }
 }
