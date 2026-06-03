@@ -1,67 +1,46 @@
-// =========================
-// NivelBoss.h
-// =========================
-
-#ifndef NIVELBOSS_H
-#define NIVELBOSS_H
-
-#include <vector>
+#ifndef NIVELSELVA_H
+#define NIVELSELVA_H
 
 #include "Nivel.h"
+#include "Enemigo.h" 
+#include <vector>
+#include <cmath>
 
-#include "JefeFinal.h"
-#include "Dardo.h"
-#include "Balon.h"
+class Obstaculo : public Entidad
+{
+public:
+    Obstaculo(float x, float y, int w, int h) : Entidad(x, y, w, h) {}
+    void mover() override {}
+    void actualizar() override {}
+};
 
-#include "AgenteIA.h"
-#include "PuntajeJuego.h"
-#include "TemporizadorJuego.h"
-
-class NivelBoss : public Nivel
+class NivelSelva : public Nivel
 {
 private:
+    int distanciaRecorrida;
+    int tiempoNivel;
+    int enemigosDerrotados;
+    float metaX;
+    int ticksInvulnerable;
 
-    JefeFinal* jefe;
-
-    AgenteIA* ia;
-
-    std::vector<Dardo*> dardos;
-
-    std::vector<Balon*> balones;
-
-    PuntajeJuego puntaje;
-
-    TemporizadorJuego temporizador;
-
-    bool modoFuria;
-
-    int ultimoTiempoAtaque;
+    std::vector<Obstaculo*> obstaculos;
 
 public:
+    NivelSelva();
+    ~NivelSelva();
 
-    NivelBoss();
-
-    ~NivelBoss();
 
     void actualizar() override;
-
     void cargarNivel() override;
-
     void lanzarBalon() override;
 
-    void lanzarDardo();
+   
+    int getDistancia() const;
+    int getTiempoSegundos() const;
+    int getEnemigosDerrotados() const;
+    float getProgresoMeta() const;
 
-    int getPuntaje() const;
-
-    int getTiempo() const;
-
-    JefeFinal* getJefe() const;
-
-    std::vector<Dardo*>&
-    getDardos();
-
-    std::vector<Balon*>&
-    getBalones();
+    const std::vector<Obstaculo*>& getObstaculos() const;
 };
 
 #endif
