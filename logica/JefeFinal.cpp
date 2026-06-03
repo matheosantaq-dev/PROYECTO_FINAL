@@ -1,48 +1,37 @@
 
 
 #include "JefeFinal.h"
+#include <cmath>
 
 JefeFinal::JefeFinal(float x, float y)
-    : Enemigo(x, y)
+    : Enemigo(x, y),
+    fase(1), tiempoAtaque(0),
+    xCentro(x), amplitud(260.0f),
+    omega(0.025f), ticksGlobales(0)
 {
-    vida = 200;
+    vida = 100;
+    vidaMaxima = 100;
+    velocidadMovimiento = 0;
 
-    fase = 1;
+   
 
-    velocidadMovimiento = 5;
-
-    velocidadAtaque = 1.0;
-
-    tiempoAtaque = 0;
-
-    velocidadX = velocidadMovimiento;
+    // Hitbox física alineada correctamente al tamaño real de su sprite
+    this->ancho = 128;
+    this->alto = 128;
 }
 
 void JefeFinal::actualizar()
 {
-    if(!estaVivo())
-    {
-        return;
-    }
-    
-    mover();
+    if (!estaVivo()) return;
 
+    ticksGlobales++;
     tiempoAtaque++;
 
-    // Movimiento lateral
-    if(x <= 100)
-    {
-        velocidadX = velocidadMovimiento;
-    }
+    // Movimiento oscilatorio de la liana usando su nuevo origen superior 
+    x = xCentro + amplitud * std::sin(omega * ticksGlobales);
 
-    if(x >= 700)
-    {
-        velocidadX = -velocidadMovimiento;
-    }
-
-    // Cambio de fase
-    if(vida <= 100 && fase == 1)
-    {
+    // Cambio de fase automático al llegar al 50% de HP o menos
+    if (vida <= (vidaMaxima / 2) && fase == 1) {
         cambiarFase();
     }
 }
@@ -50,28 +39,39 @@ void JefeFinal::actualizar()
 void JefeFinal::cambiarFase()
 {
     fase = 2;
-
-    velocidadMovimiento = 8;
-
-    velocidadAtaque = 2.0;
+    omega = 0.045f;
+    amplitud = 300.0f;
 }
 
-int JefeFinal::getFase() const
+void JefeFinal::setVida(int v)
 {
-    return fase;
+    vida = v;
+    if (vida < 0) vida = 0;
+    if (vida == 0) vivo = false;
 }
 
-int JefeFinal::getTiempoAtaque() const
+void JefeFinal::setDificultad(int dif)
 {
-    return tiempoAtaque;
-}
-
-void JefeFinal::setVida(int nuevaVida)
-{
-    vida = nuevaVida;
-
-    if(vida < 0)
+    switch (dif)
     {
-        vida = 0;
+    case 0: // FACIL
+        omega = 0.018f;
+        vida = 70;
+        vidaMaxima = 70;
+        break;
+    case 1: // INTERMEDIO
+        omega = 0.025f;
+        vida = 100;
+        vidaMaxima = 100;
+        break;
+    case 2: // DIFICIL
+        omega = 0.038f;
+        vida = 140;
+        vidaMaxima = 140;
+        break;
+    default:
+        omega = 0.025f;
+        vida = 100;
+        vidaMaxima = 100;
     }
 }
