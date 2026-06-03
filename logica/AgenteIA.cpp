@@ -1,48 +1,60 @@
-#include "AgenteIA.h"
+#ifndef AGENTEIA_H
+#define AGENTEIA_H
 
-AgenteIA::AgenteIA(Jugador* jugador,
-                   JefeFinal* jefe,
-                   int dificultad)
+#include "Jugador.h"
+#include "JefeFinal.h"
+#include <vector>
+
+// Registro de percepcion: captura el estado del jugador en un instante
+struct RegistroPercepcion
 {
-    this->jugador = jugador;
+    float posX;
+    float posY;
+    float velX;
+    bool  agachado;
+    int   tick;
+};
 
-    this->jefe = jefe;
-
-    this->dificultad = dificultad;
-}
-
-void AgenteIA::actualizarIA()
+// Agente Inteligente que controla al JefeFinal.
+// Implementa los 4 componentes obligatorios:
+//   a) PERCEPCION  — lee posicion, velocidad y estado del jugador
+//   b) RAZONAMIENTO — calcula donde va a estar el jugador y decide accion
+//   c) ACCION       — mueve al jefe hacia la posicion predicha
+//   d) APRENDIZAJE  — guarda historial y mejora la prediccion con el tiempo
+class AgenteIA
 {
-    int velocidadIA = 2;
+private:
+    Jugador*   jugador;
+    JefeFinal* jefe;
+    int        dificultad;
 
-    // Dificultad afecta IA
-    if(dificultad == 0)
-    {
-        velocidadIA = 1;
-    }
+    // (d) APRENDIZAJE: historial de posiciones 
+    std::vector<RegistroPercepcion> historial;
+    float tendenciaAprendida;   
+    int   contadorTicks;
+    int   intervaloDecision;    
+    int   aciertosTotales;      
+    int   prediccionesTotales;  
 
-    if(dificultad == 1)
-    {
-        velocidadIA = 3;
-    }
+    // (a) PERCEPCION
+    RegistroPercepcion percibir();
 
-    if(dificultad == 2)
-    {
-        velocidadIA = 5;
-    }
+    // (b) RAZONAMIENTO
+    float razonar(const RegistroPercepcion& p);
 
-    // Boss sigue al jugador
-    if(jugador->getX() < jefe->getX())
-    {
-        jefe->setVelocidadX(
-            -velocidadIA
-        );
-    }
+    // (d) APRENDIZAJE
+    void aprender(const RegistroPercepcion& p);
 
-    if(jugador->getX() > jefe->getX())
-    {
-        jefe->setVelocidadX(
-            velocidadIA
-        );
-    }
-}
+public:
+    AgenteIA(Jugador* jugador, JefeFinal* jefe, int dificultad);
+
+    // (c) ACCION — punto de entrada principal
+    void actualizarIA();
+
+    // Metricas de aprendizaje (utiles para HUD debug y sustentacion)
+    float getTendenciaAprendida()  const;
+    int   getTamanoHistorial()     const;
+    float getTasaAcierto()         const;
+};
+
+#endif
