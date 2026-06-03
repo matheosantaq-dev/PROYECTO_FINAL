@@ -2,28 +2,24 @@
 #define CONFIGURACIONJUEGO_H
 
 #include <QString>
-
 #include "Dificultad.h"
 
 class ConfiguracionJuego
 {
 private:
-
-    QString nombreJugador;
-
+    QString    nombreJugador;
     Dificultad dificultad;
 
 public:
-
     ConfiguracionJuego();
 
-    void setNombreJugador(QString nombre);
+    void       setNombreJugador(const QString& nombre);
+    void       setDificultad(Dificultad dificultad);
 
-    QString getNombreJugador() const;
-
-    void setDificultad(Dificultad dificultad);
-
-    Dificultad getDificultad() const;
+    QString    getNombreJugador() const;
+    Dificultad getDificultad()    const;
+    int        getDificultadInt() const; 
 };
 
 #endif
+
