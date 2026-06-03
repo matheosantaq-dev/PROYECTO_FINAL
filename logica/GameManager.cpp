@@ -16,15 +16,8 @@ GameManager::~GameManager()
 
 void GameManager::iniciarJuego()
 {
-    delete nivelActual;
-
-    nivelActual = nullptr;
-
+    // Iniciar nivel 1
     nivelActual = new NivelSelva();
-
-    numeroNivel = 1;
-
-    juegoTerminado = false;
 }
 
 void GameManager::actualizar()
@@ -45,7 +38,6 @@ void GameManager::cambiarNivel()
 {
     delete nivelActual;
 
-    nivelActual = nullptr;
     // PASAR A NIVEL 2
 
 
@@ -58,7 +50,7 @@ void GameManager::cambiarNivel()
 
 
     // FIN DEL JUEGO
-   
+
 
     else
     {
@@ -89,23 +81,23 @@ bool GameManager::estaTerminado() const
 
 
 void GameManager::setDificultad(
-        Dificultad dificultad)
+    Dificultad dificultad)
 {
     configuracion.setDificultad(
         dificultad
-    );
+        );
 }
 
 
-// CONFIGURAR NOMBRE
+
 
 
 void GameManager::setNombreJugador(
-        QString nombre)
+    QString nombre)
 {
     configuracion.setNombreJugador(
         nombre
-    );
+        );
 }
 
 
