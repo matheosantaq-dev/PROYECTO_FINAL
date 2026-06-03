@@ -43,11 +43,11 @@ public:
 
     void setDificultad(
         Dificultad dificultad
-    );
+        );
 
     void setNombreJugador(
         QString nombre
-    );
+        );
 
     int getNumeroNivel() const;
 };
