@@ -3,9 +3,9 @@
 
 enum Dificultad
 {
-    FACIL,
-    INTERMEDIO,
-    DIFICIL
+    FACIL      = 0,
+    INTERMEDIO = 1,
+    DIFICIL    = 2
 };
 
 #endif
