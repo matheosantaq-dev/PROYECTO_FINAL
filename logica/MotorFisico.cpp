@@ -1,24 +1,7 @@
 #include "MotorFisico.h"
 
-bool MotorFisico::detectarColision(
-        Entidad* a,
-        Entidad* b)
+bool MotorFisico::detectarColision(const Entidad* a, const Entidad* b)
 {
-    float ax = a->getX();
-    float ay = a->getY();
-
-    float bx = b->getX();
-    float by = b->getY();
-
-    // Colisión 
-
-    if(ax < bx + 50 &&
-       ax + 50 > bx &&
-       ay < by + 50 &&
-       ay + 50 > by)
-    {
-        return true;
-    }
-
-    return false;
+    if (!a || !b) return false;
+    return a->colisionaCon(b);
 }
