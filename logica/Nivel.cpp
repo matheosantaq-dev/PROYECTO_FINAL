@@ -1,40 +1,43 @@
 #include "Nivel.h"
 
 Nivel::Nivel()
-{
-    jugador = nullptr;
-
-    terminado = false;
-}
+    : jugador(nullptr),
+    estado(JUGANDO),
+    ticksTransicion(0)
+{}
 
 Nivel::~Nivel()
 {
     delete jugador;
     jugador = nullptr;
-    for(Enemigo* enemigo : enemigos)
-    {
-        delete enemigo;
-    }
-    for(Enemigo*& enemigo : enemigos)
-    {
-        enemigo = nullptr;
-    }
+
+    for (Enemigo* e : enemigos)
+        delete e;
     enemigos.clear();
 }
 
-bool Nivel::estaTerminado() const
+void Nivel::iniciarTransicion(int duracionTicks)
 {
-    return terminado;
+    estado = TRANSICION;
+    ticksTransicion = duracionTicks;
 }
 
-Jugador* Nivel::getJugador() const
+void Nivel::actualizarTransicion()
 {
-    return jugador;
+    if (estado == TRANSICION)
+    {
+        --ticksTransicion;
+        if (ticksTransicion <= 0)
+            estado = TERMINADO;
+    }
 }
 
-const std::vector<Enemigo*>& 
-Nivel::getEnemigos() const
-{
-    return enemigos;
-    
-}
+bool        Nivel::estaTerminado()  const { return estado == TERMINADO; }
+bool        Nivel::enTransicion()   const { return estado == TRANSICION; }
+EstadoNivel Nivel::getEstado()      const { return estado; }
+
+Jugador* Nivel::getJugador() const { return jugador; }
+
+const std::vector<Enemigo*>& Nivel::getEnemigos() const { return enemigos; }
+
+int Nivel::getPuntaje() const { return puntaje.getPuntosTotal(); }
