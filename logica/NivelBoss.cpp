@@ -1,264 +1,203 @@
-
-
-
 #include "NivelBoss.h"
-
 #include <cmath>
+#include <stdexcept>
+#include <vector>
 
-NivelBoss::NivelBoss()
+NivelBoss::NivelBoss(int dificultad)
+    : jefe(nullptr), ia(nullptr),
+    dificultad(dificultad), modoFuria(false),
+    ultimoTickAtaque(-1), ticksInvulnerable(0)
 {
-    jefe = nullptr;
+    if (dificultad < 0 || dificultad > 2)
+        throw std::invalid_argument("NivelBoss: dificultad invalida");
 
-    ia = nullptr;
+    // Intervalo entre dardos segun dificultad
+    switch (dificultad)
+    {
+    case 0: intervaloAtaque = 150; break; // FACIL: 2.5s
+    case 1: intervaloAtaque = 100; break; // MEDIO: ~1.7s
+    case 2: intervaloAtaque =  60; break; // DIFICIL: 1s
+    }
 
-    modoFuria = false;
-
-    ultimoTiempoAtaque = -1;
-
-    cargarNivel();
+    try
+    {
+        cargarNivel();
+    }
+    catch (const std::exception& e)
+    {
+        throw std::runtime_error(
+            std::string("NivelBoss: error al cargar — ") + e.what());
+    }
 }
 
 NivelBoss::~NivelBoss()
 {
     delete jefe;
-
     delete ia;
 
-    for(Dardo* dardo : dardos)
-    {
-        delete dardo;
-    }
-
-    for(Balon* balon : balones)
-    {
-        delete balon;
-    }
-
+    for (Dardo* d : dardos)   delete d;
+    for (Balon* b : balones)  delete b;
     dardos.clear();
-
     balones.clear();
 }
 
 void NivelBoss::cargarNivel()
 {
-    jugador = new Jugador(400,700);
+   
+    jugador = new Jugador(560, 380, 520.0f);
 
-    jefe = new JefeFinal(400,100);
+   
+    
+    jefe = new JefeFinal(560, 60.0f);
+    jefe->setDificultad(dificultad);
 
-    ia = new AgenteIA(
-        jugador,
-        jefe,
-        1
-    );
+    // Agente IA con los 4 componentes
+    ia = new AgenteIA(jugador, jefe, dificultad);
 }
 
 void NivelBoss::actualizar()
 {
+    if (!jugador || !jefe)
+        throw std::runtime_error("NivelBoss::actualizar — punteros nulos");
+
+    if (estado == TRANSICION)
+    {
+        actualizarTransicion();
+        return;
+    }
+    if (estado == TERMINADO) return;
+
     temporizador.actualizar();
 
     jugador->actualizar();
-
     jefe->actualizar();
-
     ia->actualizarIA();
 
-    if(temporizador.getTiempoActual() >= 30
-        && !modoFuria)
+    //  Modo furia al 50% de vida
+    if (!modoFuria && jefe->getVida() <= (dificultad == 0 ? 35 : dificultad == 1 ? 50 : 70))
     {
         modoFuria = true;
-
-        jefe->setVelocidadX(12);
-
-        if(jefe->getVida() > 400)
-        {
-            jefe->setVida(400);
-        }
+        intervaloAtaque = std::max(40, intervaloAtaque - 30);
     }
 
-    for(Dardo* dardo : dardos)
-    {
-        dardo->actualizar();
-    }
-
-    for(Balon* balon : balones)
-    {
-        balon->actualizar();
-    }
-
-    int tiempoAtaque =
-        jefe->getTiempoAtaque();
-    
-    if(
-        tiempoAtaque % 120 == 0
-        &&
-        tiempoAtaque != ultimoTiempoAtaque
-    )
+    //  Disparo automatico de dardos 
+    int tiempoActual = temporizador.getTicks();
+    if (tiempoActual - ultimoTickAtaque >= intervaloAtaque)
     {
         lanzarDardo();
-    
-        ultimoTiempoAtaque =
-            tiempoAtaque;
+        ultimoTickAtaque = tiempoActual;
     }
 
-    for(Balon* balon : balones)
+    // ── Actualizar proyectiles 
+    for (Dardo* d : dardos)  d->actualizar();
+    for (Balon* b : balones) b->actualizar();
+
+    // ── Colisiones 
+    verificarColisiones();
+    limpiarProyectilesInactivos();
+
+    // ── Condiciones de fin
+    if (!jefe->estaVivo())
     {
-        if(balon->estaActivo())
+        
+        jugador->agregarPuntos(30);
+        puntaje.guardarNivel();
+        iniciarTransicion(210); // 3.5s celebracion
+        return;
+    }
+
+    if (!jugador->estaVivo())
+    {
+        estado = TERMINADO;
+    }
+}
+
+void NivelBoss::verificarColisiones()
+{
+    // ── Balon golpea al jefe ──────────────────────────────
+    for (Balon* b : balones)
+    {
+        if (!b->estaActivo()) continue;
+
+        if (jefe && jefe->estaVivo() && b->colisionaCon(jefe))
         {
-            float dx =
-                balon->getX()
-                - jefe->getX();
+            b->desactivar();
 
-            float dy =
-                balon->getY()
-                - jefe->getY();
+            // Daño dinámico escalonado basado en el 50% de HP del jefe
+            int danioDinamico = (jefe->getVida() <= (jefe->getVidaMaxima() / 2)) ? 10 : 5;
 
-            if(std::abs(dx) < 50
-                && std::abs(dy) < 50)
-            {
-                balon->desactivar();
-
-                jefe->recibirDanio(20);
-
-                puntaje.agregarPuntos(100);
-            }
+            jefe->setVida(jefe->getVida() - danioDinamico);
         }
     }
 
-    for(Dardo* dardo : dardos)
+    // ── Dardo golpea al jugador ───────────────────────────
+    if (ticksInvulnerable > 0)
     {
-        if(dardo->estaActivo())
-        {
-            float dx =
-                dardo->getX()
-                - jugador->getX();
-
-            float dy =
-                dardo->getY()
-                - jugador->getY();
-
-            if(std::abs(dx) < 40
-                && std::abs(dy) < 40)
-            {
-                dardo->desactivar();
-
-                jugador->recibirDanio(10);
-            }
-        }
+        --ticksInvulnerable;
+        return;
     }
 
-    for(auto it = balones.begin();
-        it != balones.end();)
+    for (Dardo* d : dardos)
     {
-        if(!(*it)->estaActivo())
+        if (!d->estaActivo()) continue;
+        if (d->colisionaCon(jugador))
+        {
+            d->desactivar();
+            jugador->recibirDanio(d->getDanio());
+            ticksInvulnerable = 45;
+        }
+    }
+}
+
+void NivelBoss::limpiarProyectilesInactivos()
+{
+    for (auto it = balones.begin(); it != balones.end(); )
+    {
+        if (!(*it)->estaActivo() || (*it)->getY() < -50.0f)
         {
             delete *it;
-
             it = balones.erase(it);
         }
-        else
-        {
-            ++it;
-        }
+        else ++it;
     }
 
-    for(auto it = dardos.begin();
-        it != dardos.end();)
+    for (auto it = dardos.begin(); it != dardos.end(); )
     {
-        if(!(*it)->estaActivo())
-        {
-            delete *it;
-
-            it = dardos.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
-
-    bool finNivel =
-    !jefe->estaVivo()
-    ||
-    !jugador->estaVivo();
-    
-    if(finNivel)
-    {
-        for(Balon* balon : balones)
-        {
-            delete balon;
-        }
-    
-        balones.clear();
-    
-        for(Dardo* dardo : dardos)
-        {
-            delete dardo;
-        }
-    
-        dardos.clear();
-    
-        terminado = true;
+        if (!(*it)->estaActivo()) { delete *it; it = dardos.erase(it); }
+        else ++it;
     }
 }
 
 void NivelBoss::lanzarBalon()
 {
-    Balon* nuevoBalon;
-
-    float offsetX =
-        jugador->estaMirandoDerecha()
-        ? 40.0f
-        : -40.0f;
-
-    float velocidadBalon =
-        jugador->estaMirandoDerecha()
-        ? 8.0f
-        : -8.0f;
-    
-    nuevoBalon = new Balon(
-        jugador->getX() + offsetX,
-        jugador->getY(),
-        velocidadBalon
-    );
-
-    balones.push_back(nuevoBalon);
+    float offsetX = jugador->estaMirandoDerecha() ? 30.0f : -30.0f;
+    balones.push_back(
+        new Balon(
+            jugador->getX() + offsetX,
+            jugador->getY() - 10,
+            0.0f,
+            jugador->esFortachon()
+            )
+        );
 }
 
 void NivelBoss::lanzarDardo()
 {
-    Dardo* nuevoDardo;
+    std::vector<Dardo*>& d = dardos;
+    d.push_back(new Dardo(jefe->getX(), jefe->getY() + 40, dificultad));
 
-    nuevoDardo = new Dardo(
-        jefe->getX(),
-        jefe->getY()
-    );
-
-    dardos.push_back(nuevoDardo);
+    if (modoFuria)
+    {
+        d.push_back(new Dardo(jefe->getX() - 30, jefe->getY() + 30, dificultad));
+        d.push_back(new Dardo(jefe->getX() + 30, jefe->getY() + 30, dificultad));
+    }
 }
 
-int NivelBoss::getPuntaje() const
-{
-    return puntaje.getPuntos();
-}
+JefeFinal* NivelBoss::getJefe()            const { return jefe; }
+std::vector<Dardo*>& NivelBoss::getDardos()                { return dardos; }
+std::vector<Balon*>& NivelBoss::getBalones()               { return balones; }
+int                  NivelBoss::getTiempoSegundos()   const { return temporizador.getTiempoSegundos(); }
+bool                 NivelBoss::getModoFuria()         const { return modoFuria; }
 
-int NivelBoss::getTiempo() const
-{
-    return temporizador.getTiempoActual();
-}
 
-JefeFinal* NivelBoss::getJefe() const
-{
-    return jefe;
-}
 
-std::vector<Dardo*>&
-NivelBoss::getDardos()
-{
-    return dardos;
-}
-
-std::vector<Balon*>&
-NivelBoss::getBalones()
-{
-    return balones;
-}
