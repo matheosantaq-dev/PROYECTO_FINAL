@@ -15,7 +15,7 @@ MenuPrincipal::MenuPrincipal()
 
     nombreJugador->setPlaceholderText(
         "Nombre jugador"
-    );
+        );
 
     selectorDificultad =
         new QComboBox();
