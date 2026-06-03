@@ -1,19 +1,20 @@
 #ifndef TEMPORIZADORJUEGO_H
 #define TEMPORIZADORJUEGO_H
 
+
 class TemporizadorJuego
 {
 private:
-
-    int tiempoActual;
-
+    int ticks;      
+    int fps;         
 public:
-
-    TemporizadorJuego();
-
+    TemporizadorJuego(int fps = 60);
     void actualizar();
+    void reiniciar();
 
-    int getTiempoActual() const;
+    int   getTicks()         const;
+    int   getTiempoSegundos() const; 
+    float getTiempoExacto()  const; 
 };
 
 #endif
