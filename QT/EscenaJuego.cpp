@@ -259,6 +259,7 @@ void EscenaJuego::tick()
         if (ticksBoss >= 7) {
             ticksBoss = 0;
             frameBoss = (frameBoss + 1) % 4;
+            ticksParpadeo++;
         }
         tiempoPartida = bossActual->getTiempoSegundos();
 
@@ -350,7 +351,7 @@ void EscenaJuego::dibujarNivel1(QPainter& p)
                 p.drawPixmap(
                     static_cast<int>(enemigo->getX()) - static_cast<int>(camaraX),
                     static_cast<int>(enemigo->getY()),
-                    escalar(frame(shBoar, frameBoar, 64, 64), 64, 64));
+                    escalar(frame(shBoar, frameBoar, 384, 256), 96, 64));
                 );
                 // ===== BARRA DE VIDA =====
 
@@ -416,19 +417,16 @@ void EscenaJuego::dibujarJugadorNivel1(QPainter& p, Jugador* jugador)
     if (!jugador) return;
     QPixmap sprite;
 
-    if (jugador->getSaltando())      sprite = shJump;
-    else if (jugador->getAgachado()) sprite = shCrouch;
+    if (jugador->getSaltando())
+        sprite = frame(shJump, frameActual % 4, 370, 370);
+    else if (jugador->getAgachado())
+        sprite = frame(shCrouch, frameActual % 3, 400, 280);
     else if (teclaIzq || teclaDer)
-    {
-        sprite = frame(
-            shRun1,
-            frameActual,
-            292,
-            334
-            );
-    }
-    else if (teclaEspacio)           sprite = shThrow;
-    else                             sprite = shIdle;
+        sprite = frame(shRun1, frameActual % 7, 292, 334);
+    else if (teclaEspacio)
+        sprite = frame(shThrow, frameActual % 4, 370, 370);
+    else
+        sprite = frame(shIdle, (frameActual / 2) % 4, 148, 200);
 
     if (!jugador->estaMirandoDerecha()) {
         sprite = sprite.transformed(QTransform().scale(-1, 1));
@@ -450,11 +448,16 @@ void EscenaJuego::dibujarJugadorNivel2(QPainter& p, Jugador* jugador)
     if (jugador->getSaltando())      sprite = shJump;
     else if (jugador->getAgachado()) sprite = shCrouch;
     else if (teclaIzq || teclaDer)   sprite = (frameActual % 2 == 0) ? shRun1 : shRun2;
-    else if (teclaEspacio)           sprite = shThrow;
-    else                             sprite = shIdle;
-
-    if (!jugador->estaMirandoDerecha()) {
-        sprite = sprite.transformed(QTransform().scale(-1, 1));
+    if (jugador->getSaltando())
+        sprite = frame(shJump, frameActual % 4, 370, 370);
+    else if (jugador->getAgachado())
+        sprite = frame(shCrouch, frameActual % 3, 400, 280);
+    else if (teclaIzq || teclaDer)
+        sprite = frame((frameActual / 4) % 2 == 0 ? shRun1 : shRun2, frameActual % 7, 292, 334);
+    else if (teclaEspacio)
+        sprite = frame(shThrow, frameActual % 4, 370, 370);
+    else
+        sprite = frame(shIdle, (frameActual / 2) % 4, 148, 200);
     }
 
     p.drawPixmap(static_cast<int>(jugador->getX()) - 16,
@@ -465,20 +468,27 @@ void EscenaJuego::dibujarJugadorNivel2(QPainter& p, Jugador* jugador)
 void EscenaJuego::dibujarBoss(QPainter& p, JefeFinal* jefe)
 {
     if (!jefe || !jefe->estaVivo()) return;
-    QPixmap spriteBoss = (jefe->getFase() == 2) ? shBossHit : shBossSwingL;
 
-    // Se dibuja fielmente con su nueva posición Y aérea elevada 
-    p.drawPixmap(static_cast<int>(jefe->getX()),
-                 static_cast<int>(jefe->getY()),
-                 escalar(spriteBoss, 128, 128));
+    QPixmap spriteBoss;
+    // enemigo5 = recibiendo golpe (3 frames) — fase 2 con parpadeo
+    if (jefe->getFase() == 2 && ticksParpadeo % 10 < 5)
+        spriteBoss = frame(shBossHit, frameBoss % 3, 512, 512);
+    // enemigo4 = disparando (4 frames) — cuando tiempoAtaque es reciente
+    else if (jefe->getTiempoAtaque() % 100 < 40)
+        spriteBoss = frame(shBossFire, frameBoss % 4, 512, 512);
+    // enemigo2/3 alternados según dirección de oscilación
+    else if (jefe->getVelocidadX() >= 0)
+        spriteBoss = frame(shBossSwingR, frameBoss % 5, 310, 512);
+    else
+        spriteBoss = frame(shBossSwingL, frameBoss % 5, 310, 512);
 
-    int barraY = static_cast<int>(jefe->getY()) - 20;
-    dibujarBarraVida(p, static_cast<int>(jefe->getX()), barraY, jefe->getVida(), jefe->getVidaMaxima(), 128);
+    p.drawPixmap(static_cast<int>(jefe->getX()) - 64,
+                 static_cast<int>(jefe->getY()) - 30,
+                 escalar(spriteBoss, 192, 192));
 
-    p.setPen(QColor("#FF3333"));
-    p.setFont(QFont("Courier", 9, QFont::Bold));
-    QString textoVida = QString("HP JEFE: %1 / %2").arg(jefe->getVida()).arg(jefe->getVidaMaxima());
-    p.drawText(static_cast<int>(jefe->getX()), barraY - 8, textoVida);
+    int barraY = static_cast<int>(jefe->getY()) - 25;
+    dibujarBarraVida(p, static_cast<int>(jefe->getX()) - 64, barraY,
+                     jefe->getVida(), jefe->getVidaMaxima(), 192);
 }
 
 void EscenaJuego::dibujarProyectiles(QPainter& p, NivelBoss* nivel)
