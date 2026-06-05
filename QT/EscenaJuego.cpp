@@ -1,6 +1,24 @@
 #include "EscenaJuego.h"
 #include <QDebug>
 
+// ============================================================
+//  CONSTANTES DE FRAMES POR SPRITESHEET
+//  (ancho_total / número_de_columnas = frameW)
+// ============================================================
+//  spritejugador1 (idle)   : 2544x416  → 4 frames  de 636x416
+//  spritejugador2 (run1)   : 2544x416  → 7 frames  de 363x416  (usa 7 para run)
+//  spritejugador3 (run2)   : 2064x512  → 6 frames  de 344x512
+//  spritejugador4 (throw)  : 1792x592  → 4 frames  de 448x592
+//  spritejugador5 (jump)   : 2064x512  → 4 frames  de 516x512
+//  spritejugador6 (crouch) : 2064x512  → 4 frames  de 516x512
+//  enemigo1 (boar)         : 2064x512  → 4 frames  de 516x512
+//  enemigo2 (bossSwingL)   : 2544x416  → 5 frames  de 508x416
+//  enemigo3 (bossSwingR)   : 2544x416  → 5 frames  de 508x416
+//  enemigo4 (bossFire)     : 2064x512  → 4 frames  de 516x512
+//  enemigo5 (bossHit)      : 1792x592  → 4 frames  de 448x592
+//  hud                     : 2064x512  → 4 iconos  de 516x512
+//    icono 0=corazón  1=balón  2=reloj  3=rayo
+
 EscenaJuego::EscenaJuego(QWidget* parent)
     : QWidget(parent)
 {
@@ -86,30 +104,36 @@ NivelBoss* EscenaJuego::obtenerNivelBossActual()
 
 void EscenaJuego::cargarSprites()
 {
-    shIdle.load(":/new/Recursos/jugador/spritejugador1.png");
-    shRun1.load(":/new/Recursos/jugador/spritejugador2.png");
-    shRun2.load(":/new/Recursos/jugador/spritejugador3.png");
-    shThrow.load(":/new/Recursos/jugador/spritejugador4.png");
-    shJump.load(":/new/Recursos/jugador/spritejugador5.png");
+    // ── Jugador ──────────────────────────────────────────────
+    shIdle  .load(":/new/Recursos/jugador/spritejugador1.png");
+    shRun1  .load(":/new/Recursos/jugador/spritejugador2.png");
+    shRun2  .load(":/new/Recursos/jugador/spritejugador3.png");
+    shThrow .load(":/new/Recursos/jugador/spritejugador4.png");
+    shJump  .load(":/new/Recursos/jugador/spritejugador5.png");
     shCrouch.load(":/new/Recursos/jugador/spritejugador6.png");
 
-    shBoar.load(":/new/Recursos/enemigos/enemigo1.png");
+    // ── Enemigos ─────────────────────────────────────────────
+    shBoar      .load(":/new/Recursos/enemigos/enemigo1.png");
     shBossSwingL.load(":/new/Recursos/enemigos/enemigo2.png");
     shBossSwingR.load(":/new/Recursos/enemigos/enemigo3.png");
-    shBossFire.load(":/new/Recursos/enemigos/enemigo4.png");
-    shBossHit.load(":/new/Recursos/enemigos/enemigo5.png");
+    shBossFire  .load(":/new/Recursos/enemigos/enemigo4.png");
+    shBossHit   .load(":/new/Recursos/enemigos/enemigo5.png");
 
+    // ── Proyectiles ───────────────────────────────────────────
     shDartH.load(":/new/Recursos/proyectil/proyectil1.png");
     shDartA.load(":/new/Recursos/proyectil/proyectil2.png");
     shArrow.load(":/new/Recursos/proyectil/proyectil3.png");
-    shBall.load(":/new/Recursos/proyectil/proyectil4.png");
+    shBall .load(":/new/Recursos/proyectil/proyectil4.png");
+
+    // ── HUD ───────────────────────────────────────────────────
     shHud.load(":/new/Recursos/hud/hud.png");
 
+    // ── Fondos ────────────────────────────────────────────────
     QPixmap bg1_raw(":/new/Recursos/fondos/fondo1.png");
-    bgNivel1 = bg1_raw.scaled(4608, 720, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    bgNivel1 = bg1_raw.scaled(4608, 720, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
     QPixmap bg2_raw(":/new/Recursos/fondos/fondo2.png");
-    bgNivel2 = bg2_raw.scaled(1280, 720, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    bgNivel2 = bg2_raw.scaled(1280, 720, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 }
 
 void EscenaJuego::iniciarMusica()
@@ -139,6 +163,7 @@ void EscenaJuego::reproducirVictoria()
     }
 }
 
+// ── Extrae un frame horizontal de un spritesheet ─────────────
 QPixmap EscenaJuego::frame(const QPixmap& sheet, int idx, int frameW, int frameH)
 {
     if (sheet.isNull()) return QPixmap(frameW, frameH);
@@ -242,24 +267,26 @@ void EscenaJuego::tick()
         gameOver = true;
     }
 
+    // ── Tick de animación del jugador ────────────────────────
     ticksFrame++;
     if (ticksFrame >= 6) {
         ticksFrame = 0;
         frameActual = (frameActual + 1) % 7;
     }
 
+    // ── Tick de animación del jabalí ─────────────────────────
     ticksBoar++;
     if (ticksBoar >= 5) {
         ticksBoar = 0;
         frameBoar = (frameBoar + 1) % 4;
     }
 
+    // ── Tick de animación del boss ───────────────────────────
     if (bossActual) {
         ticksBoss++;
         if (ticksBoss >= 7) {
             ticksBoss = 0;
-            frameBoss = (frameBoss + 1) % 4;
-            ticksParpadeo++;
+            frameBoss = (frameBoss + 1) % 5;   // 5 frames en swing sheets
         }
         tiempoPartida = bossActual->getTiempoSegundos();
 
@@ -332,10 +359,17 @@ void EscenaJuego::dibujarMenu(QPainter& p)
     p.drawText(rect(), Qt::AlignCenter, selector);
 }
 
+// ============================================================
+//  DIBUJAR NIVEL 1
+// ============================================================
 void EscenaJuego::dibujarNivel1(QPainter& p)
 {
-    p.drawPixmap(0, 0, bgNivel1, static_cast<int>(camaraX), 0, 1280, 720);
+    int camX = static_cast<int>(camaraX);
 
+    // Dibujamos el fondo desde el offset calculado
+    // Fuente: (camX, 0, 1280, 720)
+    // Destino: (0, 0, 1280, 720)
+    p.drawPixmap(0, 0, bgNivel1, camX, 0, 1280, 720);
 
     if (jugadorActual) {
         dibujarJugadorNivel1(p, jugadorActual);
@@ -344,47 +378,28 @@ void EscenaJuego::dibujarNivel1(QPainter& p)
 
     if (gm && gm->getNivelActual()) {
         auto enemigosSelva = gm->getNivelActual()->getEnemigos();
-        for (auto* enemigo : enemigosSelva)
-        {
-            if (enemigo && enemigo->estaVivo())
-            {
+        for (auto* enemigo : enemigosSelva) {
+            if (enemigo && enemigo->estaVivo()) {
+                // Jabalí animado con 4 frames de 516x512
+                QPixmap sprEnemy = frame(shBoar, frameBoar, 516, 512);
                 p.drawPixmap(
                     static_cast<int>(enemigo->getX()) - static_cast<int>(camaraX),
                     static_cast<int>(enemigo->getY()),
-                    escalar(frame(shBoar, frameBoar, 384, 256), 96, 64));
-                );
-                // ===== BARRA DE VIDA =====
+                    escalar(sprEnemy, 64, 64));
 
-                int xBarra =
-                    static_cast<int>(enemigo->getX()) -
-                    static_cast<int>(camaraX);
-
-                int yBarra =
-                    static_cast<int>(enemigo->getY()) - 12;
-
-
-                p.fillRect(
-                    xBarra,
-                    yBarra,
-                    50,
-                    6,
-                    Qt::red
-                );
-
-                // Vida actual
-                p.fillRect(
-                    xBarra,
-                    yBarra,
-                    enemigo->getVida(),
-                    6,
-                    Qt::green
-                );
+                // Barra de vida del enemigo
+                int xBarra = static_cast<int>(enemigo->getX()) - static_cast<int>(camaraX);
+                int yBarra = static_cast<int>(enemigo->getY()) - 12;
+                p.fillRect(xBarra, yBarra, 50, 6, Qt::red);
+                p.fillRect(xBarra, yBarra, enemigo->getVida(), 6, Qt::green);
             }
         }
     }
 }
 
-
+// ============================================================
+//  DIBUJAR NIVEL 2
+// ============================================================
 void EscenaJuego::dibujarNivel2(QPainter& p)
 {
     p.drawPixmap(0, 0, bgNivel2);
@@ -412,132 +427,204 @@ void EscenaJuego::dibujarNivel2(QPainter& p)
     }
 }
 
+// ============================================================
+//  DIBUJAR JUGADOR NIVEL 1  —  cada acción = su spritesheet
+// ============================================================
 void EscenaJuego::dibujarJugadorNivel1(QPainter& p, Jugador* jugador)
 {
     if (!jugador) return;
     QPixmap sprite;
 
-    if (jugador->getSaltando())
-        sprite = frame(shJump, frameActual % 4, 370, 370);
-    else if (jugador->getAgachado())
-        sprite = frame(shCrouch, frameActual % 3, 400, 280);
-    else if (teclaIzq || teclaDer)
-        sprite = frame(shRun1, frameActual % 7, 292, 334);
-    else if (teclaEspacio)
-        sprite = frame(shThrow, frameActual % 4, 370, 370);
-    else
-        sprite = frame(shIdle, (frameActual / 2) % 4, 148, 200);
+    if (jugador->getSaltando()) {
+        // jump: 4 frames de 516x512
+        sprite = frame(shJump, frameActual % 4, 516, 512);
+
+    } else if (jugador->getAgachado()) {
+        // crouch: 4 frames de 516x512
+        sprite = frame(shCrouch, frameActual % 4, 516, 512);
+
+    } else if (teclaEspacio) {
+        // throw: 4 frames de 448x592
+        sprite = frame(shThrow, frameActual % 4, 448, 592);
+
+    } else if (teclaIzq || teclaDer) {
+        // Alterna entre run1 (7 frames 363x416) y run2 (6 frames 344x512)
+        if (frameActual % 2 == 0)
+            sprite = frame(shRun1, frameActual % 7, 363, 416);
+        else
+            sprite = frame(shRun2, frameActual % 6, 344, 512);
+
+    } else {
+        // idle: 4 frames de 636x416
+        sprite = frame(shIdle, frameActual % 4, 636, 416);
+    }
 
     if (!jugador->estaMirandoDerecha()) {
         sprite = sprite.transformed(QTransform().scale(-1, 1));
     }
-    
+
     p.drawPixmap(
-        static_cast<int>(jugador->getX()) -
-        static_cast<int>(camaraX) - 16,
-        
+        static_cast<int>(jugador->getX()) - static_cast<int>(camaraX) - 16,
         static_cast<int>(jugador->getY()) - 32,
         escalar(sprite, 96, 96));
 }
 
+// ============================================================
+//  DIBUJAR JUGADOR NIVEL 2  —  igual que nivel 1, sin cámara
+// ============================================================
 void EscenaJuego::dibujarJugadorNivel2(QPainter& p, Jugador* jugador)
 {
     if (!jugador) return;
     QPixmap sprite;
 
-    if (jugador->getSaltando())      sprite = shJump;
-    else if (jugador->getAgachado()) sprite = shCrouch;
-    else if (teclaIzq || teclaDer)   sprite = (frameActual % 2 == 0) ? shRun1 : shRun2;
-    if (jugador->getSaltando())
-        sprite = frame(shJump, frameActual % 4, 370, 370);
-    else if (jugador->getAgachado())
-        sprite = frame(shCrouch, frameActual % 3, 400, 280);
-    else if (teclaIzq || teclaDer)
-        sprite = frame((frameActual / 4) % 2 == 0 ? shRun1 : shRun2, frameActual % 7, 292, 334);
-    else if (teclaEspacio)
-        sprite = frame(shThrow, frameActual % 4, 370, 370);
-    else
-        sprite = frame(shIdle, (frameActual / 2) % 4, 148, 200);
+    if (jugador->getSaltando()) {
+        sprite = frame(shJump, frameActual % 4, 516, 512);
+
+    } else if (jugador->getAgachado()) {
+        sprite = frame(shCrouch, frameActual % 4, 516, 512);
+
+    } else if (teclaEspacio) {
+        sprite = frame(shThrow, frameActual % 4, 448, 592);
+
+    } else if (teclaIzq || teclaDer) {
+        if (frameActual % 2 == 0)
+            sprite = frame(shRun1, frameActual % 7, 363, 416);
+        else
+            sprite = frame(shRun2, frameActual % 6, 344, 512);
+
+    } else {
+        sprite = frame(shIdle, frameActual % 4, 636, 416);
     }
 
-    p.drawPixmap(static_cast<int>(jugador->getX()) - 16,
-                 static_cast<int>(jugador->getY()) - 32,
-                 escalar(sprite, 96, 96));
+    if (!jugador->estaMirandoDerecha()) {
+        sprite = sprite.transformed(QTransform().scale(-1, 1));
+    }
+
+    p.drawPixmap(
+        static_cast<int>(jugador->getX()) - 16,
+        static_cast<int>(jugador->getY()) - 32,
+        escalar(sprite, 96, 96));
 }
 
+// ============================================================
+//  DIBUJAR BOSS  —  cambia de sheet según fase + animado
+// ============================================================
 void EscenaJuego::dibujarBoss(QPainter& p, JefeFinal* jefe)
 {
     if (!jefe || !jefe->estaVivo()) return;
 
     QPixmap spriteBoss;
-    // enemigo5 = recibiendo golpe (3 frames) — fase 2 con parpadeo
-    if (jefe->getFase() == 2 && ticksParpadeo % 10 < 5)
-        spriteBoss = frame(shBossHit, frameBoss % 3, 512, 512);
-    // enemigo4 = disparando (4 frames) — cuando tiempoAtaque es reciente
-    else if (jefe->getTiempoAtaque() % 100 < 40)
-        spriteBoss = frame(shBossFire, frameBoss % 4, 512, 512);
-    // enemigo2/3 alternados según dirección de oscilación
-    else if (jefe->getVelocidadX() >= 0)
-        spriteBoss = frame(shBossSwingR, frameBoss % 5, 310, 512);
-    else
-        spriteBoss = frame(shBossSwingL, frameBoss % 5, 310, 512);
+    int bx = static_cast<int>(jefe->getX());
+    int by = static_cast<int>(jefe->getY());
 
-    p.drawPixmap(static_cast<int>(jefe->getX()) - 64,
-                 static_cast<int>(jefe->getY()) - 30,
-                 escalar(spriteBoss, 192, 192));
+    if (jefe->getFase() == 2) {
+        // Fase 2 (golpeado): sheet hit 4 frames de 448x592
+        spriteBoss = frame(shBossHit, frameBoss % 4, 448, 592);
+    } else {
+        // Fase 1: alterna swing izquierda (frameBoss par) y derecha (impar)
+        if (frameBoss % 2 == 0)
+            spriteBoss = frame(shBossSwingL, frameBoss % 5, 508, 416);
+        else
+            spriteBoss = frame(shBossSwingR, frameBoss % 5, 508, 416);
+    }
 
-    int barraY = static_cast<int>(jefe->getY()) - 25;
-    dibujarBarraVida(p, static_cast<int>(jefe->getX()) - 64, barraY,
-                     jefe->getVida(), jefe->getVidaMaxima(), 192);
+    p.drawPixmap(bx, by, escalar(spriteBoss, 160, 160));
+
+    int barraY = by - 20;
+    dibujarBarraVida(p, bx, barraY, jefe->getVida(), jefe->getVidaMaxima(), 160);
+
+    p.setPen(QColor("#FF3333"));
+    p.setFont(QFont("Courier", 9, QFont::Bold));
+    p.drawText(bx, barraY - 8,
+               QString("HP JEFE: %1 / %2").arg(jefe->getVida()).arg(jefe->getVidaMaxima()));
 }
 
+// ============================================================
+//  DIBUJAR PROYECTILES
+// ============================================================
 void EscenaJuego::dibujarProyectiles(QPainter& p, NivelBoss* nivel)
 {
     if (!nivel) return;
 
+    // Dardos horizontales — proyectil1: 1 frame (usa directo)
     auto dardosActuales = nivel->getDardos();
     for (auto* dardo : dardosActuales) {
-        if (dardo && dardo->estaActivo()) {
-        QPixmap dartFrame = frame(shDartA, 1, 512, 256); // flecha diagonal
-        // Rotar 90° para que caiga verticalmente
-        QTransform rot;
-        rot.rotate(90);
-        p.drawPixmap(static_cast<int>(dardo->getX()) - 8,
-                     static_cast<int>(dardo->getY()) - 8,
-                     escalar(dartFrame.transformed(rot), 16, 32));
+        if (dardo) {
+            // proyectil1 tiene 2 frames de 1032x512 → usamos frame 0 (horizontal)
+            QPixmap pxDart = frame(shDartH, 0, 1032, 512);
+            p.drawPixmap(static_cast<int>(dardo->getX()),
+                         static_cast<int>(dardo->getY()),
+                         escalar(pxDart, 48, 16));
         }
     }
 
+    // Balones — proyectil4: icono directo
     auto balonesActuales = nivel->getBalones();
     for (auto* balon : balonesActuales) {
         if (balon) {
-            p.drawPixmap(static_cast<int>(balon->getX()), static_cast<int>(balon->getY()), escalar(shBall, 24, 24));
+            p.drawPixmap(static_cast<int>(balon->getX()),
+                         static_cast<int>(balon->getY()),
+                         escalar(shBall, 32, 32));
         }
     }
 }
 
+// ============================================================
+//  DIBUJAR HUD  —  usa los 4 iconos del hud.png por separado
+//
+//  hud.png: 2064x512 → 4 iconos de 516x512
+//    índice 0 = corazón (vida)
+//    índice 1 = balón   (puntos)
+//    índice 2 = reloj   (tiempo)
+//    índice 3 = rayo    (power-ups)
+// ============================================================
 void EscenaJuego::dibujarHUD(QPainter& p, Jugador* jugador, int tiempo, int puntaje)
 {
-    p.drawPixmap(10, 10, escalar(shHud, 240, 80));
+    const int ICO = 36;   // tamaño de cada icono en pantalla
+    const int PAD = 10;   // margen izquierdo/superior
+    const int SEP = 8;    // separación entre icono y texto
+
+    // ── Fondo semitransparente del HUD ──
+    p.fillRect(PAD, PAD, 340, 80, QColor(0, 0, 0, 140));
+
+    // ── Icono corazón + barra de vida ──
+    QPixmap icoCorazon = frame(shHud, 0, 516, 512);
+    p.drawPixmap(PAD + 4, PAD + 4, escalar(icoCorazon, ICO, ICO));
+    dibujarBarraVida(p,
+                     PAD + 4 + ICO + SEP,
+                     PAD + 14,
+                     jugador->getVida(),
+                     jugador->getVidaMaxima(),
+                     200);
+
+    // ── Icono balón + puntos ──
+    QPixmap icoBalon = frame(shHud, 1, 516, 512);
+    p.drawPixmap(PAD + 4, PAD + ICO + 10, escalar(icoBalon, ICO, ICO));
     p.setPen(QColor("#FFFFFF"));
-    p.setFont(QFont("Courier", 10, QFont::Bold));
+    p.setFont(QFont("Courier", 11, QFont::Bold));
+    p.drawText(PAD + 4 + ICO + SEP,
+               PAD + ICO + 10 + ICO - 6,
+               QString("PUNTOS: %1").arg(puntaje));
 
-    p.drawText(35, 32, QString("PUNTOS: %1").arg(puntaje));
-    p.drawText(140, 32, QString("TIEMPO: %1s").arg(tiempo));
-    if (gm) {
-        p.drawText(35, 48, QString("NIVEL: %1").arg(gm->getNumeroNivel()));
+    // ── Icono reloj + tiempo (solo nivel 2) ──
+    if (gm && gm->getNumeroNivel() == 2) {
+        QPixmap icoReloj = frame(shHud, 2, 516, 512);
+        p.drawPixmap(220, PAD + 4, escalar(icoReloj, ICO, ICO));
+        p.setPen(QColor("#FFFFFF"));
+        p.setFont(QFont("Courier", 11, QFont::Bold));
+        p.drawText(220 + ICO + SEP, PAD + ICO - 2,
+                   QString("T: %1s").arg(tiempo));
     }
 
-    dibujarBarraVida(p, 35, 62, jugador->getVida(), jugador->getVidaMaxima(), 120);
-
-    p.setFont(QFont("Courier", 9, QFont::Bold));
-    if (jugador->esFortachon()) {
-        p.setPen(QColor("#FF3366"));
-        p.drawText(260, 30, "FORTACHON");
-    }
-    if (jugador->esVeloz()) {
-        p.setPen(QColor("#33FF66"));
-        p.drawText(260, 48, "VELOZ");
+    // ── Icono rayo + power-ups activos ──
+    if (jugador->esFortachon() || jugador->esVeloz()) {
+        QPixmap icoRayo = frame(shHud, 3, 516, 512);
+        p.drawPixmap(220, PAD + ICO + 10, escalar(icoRayo, ICO, ICO));
+        p.setFont(QFont("Courier", 9, QFont::Bold));
+        QString powers;
+        if (jugador->esFortachon()) { p.setPen(QColor("#FF3366")); powers += "FORTACHON "; }
+        if (jugador->esVeloz())     { p.setPen(QColor("#33FF66")); powers += "VELOZ"; }
+        p.drawText(220 + ICO + SEP, PAD + ICO + 10 + ICO - 6, powers);
     }
 }
 
@@ -571,7 +658,8 @@ void EscenaJuego::dibujarVictoria(QPainter& p)
 
     p.setFont(QFont("Courier", 16, QFont::Bold));
     p.setPen(QColor("#FFFFFF"));
-    p.drawText(rect(), Qt::AlignCenter, QString("HAS COMPLETADO EL DESAFIO DEL JUEGO\n\nPUNTAJE FINAL: %1").arg(puntajeFinal));
+    p.drawText(rect(), Qt::AlignCenter,
+               QString("HAS COMPLETADO EL DESAFIO DEL JUEGO\n\nPUNTAJE FINAL: %1").arg(puntajeFinal));
 }
 
 void EscenaJuego::dibujarGameOver(QPainter& p)
@@ -613,7 +701,7 @@ void EscenaJuego::keyPressEvent(QKeyEvent* event)
     if (event->key() == Qt::Key_D || event->key() == Qt::Key_Right) teclaDer = true;
     if (event->key() == Qt::Key_W || event->key() == Qt::Key_Up)    teclaArriba = true;
     if (event->key() == Qt::Key_S || event->key() == Qt::Key_Down)  teclaAbajo = true;
-    if (event->key() == Qt::Key_Space)                              teclaEspacio = true;
+    if (event->key() == Qt::Key_Space)                               teclaEspacio = true;
 }
 
 void EscenaJuego::keyReleaseEvent(QKeyEvent* event)
@@ -622,5 +710,6 @@ void EscenaJuego::keyReleaseEvent(QKeyEvent* event)
     if (event->key() == Qt::Key_D || event->key() == Qt::Key_Right) teclaDer = false;
     if (event->key() == Qt::Key_W || event->key() == Qt::Key_Up)    teclaArriba = false;
     if (event->key() == Qt::Key_S || event->key() == Qt::Key_Down)  teclaAbajo = false;
-    if (event->key() == Qt::Key_Space)                              teclaEspacio = false;
+    if (event->key() == Qt::Key_Space)                               teclaEspacio = false;
 }
+
