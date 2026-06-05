@@ -106,10 +106,10 @@ void EscenaJuego::cargarSprites()
     shHud.load(":/new/Recursos/hud/hud.png");
 
     QPixmap bg1_raw(":/new/Recursos/fondos/fondo1.png");
-    bgNivel1 = bg1_raw.scaled(4608, 720, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    bgNivel1 = bg1_raw.scaled(4608, 720, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 
     QPixmap bg2_raw(":/new/Recursos/fondos/fondo2.png");
-    bgNivel2 = bg2_raw.scaled(1280, 720, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    bgNivel2 = bg2_raw.scaled(1280, 720, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 }
 
 void EscenaJuego::iniciarMusica()
@@ -245,7 +245,7 @@ void EscenaJuego::tick()
     ticksFrame++;
     if (ticksFrame >= 6) {
         ticksFrame = 0;
-        frameActual = (frameActual + 1) % 4;
+        frameActual = (frameActual + 1) % 7;
     }
 
     ticksBoar++;
@@ -343,55 +343,46 @@ void EscenaJuego::dibujarNivel1(QPainter& p)
 
     if (gm && gm->getNivelActual()) {
         auto enemigosSelva = gm->getNivelActual()->getEnemigos();
-        for (auto* enemigo : enemigosSelva) {
-            if (enemigo && enemigo->estaVivo()) {
-                
-                p.drawPixmap(static_cast<int>(enemigo->getX()) - static_cast<int>(camaraX),
-                             static_cast<int>(enemigo->getY()),
-                             escalar(frame(shBoar, frameBoar, 64, 64), 64, 64));
-                for (auto* enemigo : enemigosSelva) {
-                    if (enemigo && enemigo->estaVivo()) {
+        for (auto* enemigo : enemigosSelva)
+        {
+            if (enemigo && enemigo->estaVivo())
+            {
+                p.drawPixmap(
+                    static_cast<int>(enemigo->getX()) - static_cast<int>(camaraX),
+                    static_cast<int>(enemigo->getY()),
+                    escalar(frame(shBoar, frameBoar, 64, 64), 64, 64));
+                );
+                // ===== BARRA DE VIDA =====
 
-                        p.drawPixmap(
-                            static_cast<int>(enemigo->getX()) - static_cast<int>(camaraX),
-                            static_cast<int>(enemigo->getY()),
-                            escalar(frame(shBoar, frameBoar, 64, 64), 64, 64)
-                            );
+                int xBarra =
+                    static_cast<int>(enemigo->getX()) -
+                    static_cast<int>(camaraX);
 
-                        // ===== BARRA DE VIDA =====
-
-                        int xBarra =
-                            static_cast<int>(enemigo->getX()) -
-                            static_cast<int>(camaraX);
-
-                        int yBarra =
-                            static_cast<int>(enemigo->getY()) - 12;
-
-                      
-                        p.fillRect(
-                            xBarra,
-                            yBarra,
-                            50,
-                            6,
-                            Qt::red
-                            );
-
-                        // Vida actual
-                        p.fillRect(
-                            xBarra,
-                            yBarra,
-                            enemigo->getVida(), 
-                            6,
-                            Qt::green
-                            );
+                int yBarra =
+                    static_cast<int>(enemigo->getY()) - 12;
 
 
-                    }
-                }
+                p.fillRect(
+                    xBarra,
+                    yBarra,
+                    50,
+                    6,
+                    Qt::red
+                );
+
+                // Vida actual
+                p.fillRect(
+                    xBarra,
+                    yBarra,
+                    enemigo->getVida(),
+                    6,
+                    Qt::green
+                );
             }
         }
     }
 }
+
 
 void EscenaJuego::dibujarNivel2(QPainter& p)
 {
@@ -427,17 +418,28 @@ void EscenaJuego::dibujarJugadorNivel1(QPainter& p, Jugador* jugador)
 
     if (jugador->getSaltando())      sprite = shJump;
     else if (jugador->getAgachado()) sprite = shCrouch;
-    else if (teclaIzq || teclaDer)   sprite = (frameActual % 2 == 0) ? shRun1 : shRun2;
+    else if (teclaIzq || teclaDer)
+    {
+        sprite = frame(
+            shRun1,
+            frameActual,
+            292,
+            334
+            );
+    }
     else if (teclaEspacio)           sprite = shThrow;
     else                             sprite = shIdle;
 
     if (!jugador->estaMirandoDerecha()) {
         sprite = sprite.transformed(QTransform().scale(-1, 1));
     }
-
-    p.drawPixmap(static_cast<int>(jugador->getX()) - static_cast<int>(camaraX),
-                 static_cast<int>(jugador->getY()),
-                 escalar(sprite, 64, 64));
+    
+    p.drawPixmap(
+        static_cast<int>(jugador->getX()) -
+        static_cast<int>(camaraX) - 16,
+        
+        static_cast<int>(jugador->getY()) - 32,
+        escalar(sprite, 96, 96));
 }
 
 void EscenaJuego::dibujarJugadorNivel2(QPainter& p, Jugador* jugador)
@@ -455,9 +457,9 @@ void EscenaJuego::dibujarJugadorNivel2(QPainter& p, Jugador* jugador)
         sprite = sprite.transformed(QTransform().scale(-1, 1));
     }
 
-    p.drawPixmap(static_cast<int>(jugador->getX()) - 40,
-                 static_cast<int>(jugador->getY()) - 48,
-                 escalar(sprite, 128, 128));
+    p.drawPixmap(static_cast<int>(jugador->getX()) - 16,
+                 static_cast<int>(jugador->getY()) - 32,
+                 escalar(sprite, 96, 96));
 }
 
 void EscenaJuego::dibujarBoss(QPainter& p, JefeFinal* jefe)
