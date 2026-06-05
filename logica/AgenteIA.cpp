@@ -1,4 +1,4 @@
-include "AgenteIA.h"
+#include "AgenteIA.h"
 #include <cmath>
 #include <stdexcept>
 
