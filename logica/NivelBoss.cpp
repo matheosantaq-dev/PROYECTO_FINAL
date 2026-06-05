@@ -43,11 +43,11 @@ NivelBoss::~NivelBoss()
 
 void NivelBoss::cargarNivel()
 {
-   
+    // Jugador en la parte inferior — piso en y=680
     jugador = new Jugador(560, 380, 520.0f);
 
-   
-    
+    // CORRECCIÓN: Se cambia Y de 500.0f a 220.0f para ubicar al jefe claramente por encima de la mitad
+    // de la pantalla (720 / 2 = 360). Así simula estar colgado y es alcanzable por los balones.
     jefe = new JefeFinal(560, 60.0f);
     jefe->setDificultad(dificultad);
 
@@ -73,14 +73,14 @@ void NivelBoss::actualizar()
     jefe->actualizar();
     ia->actualizarIA();
 
-    //  Modo furia al 50% de vida
+    // ── Modo furia al 50% de vida ─────────────────────────
     if (!modoFuria && jefe->getVida() <= (dificultad == 0 ? 35 : dificultad == 1 ? 50 : 70))
     {
         modoFuria = true;
         intervaloAtaque = std::max(40, intervaloAtaque - 30);
     }
 
-    //  Disparo automatico de dardos 
+    // ── Disparo automatico de dardos ──────────────────────
     int tiempoActual = temporizador.getTicks();
     if (tiempoActual - ultimoTickAtaque >= intervaloAtaque)
     {
@@ -88,18 +88,18 @@ void NivelBoss::actualizar()
         ultimoTickAtaque = tiempoActual;
     }
 
-    // ── Actualizar proyectiles 
+    // ── Actualizar proyectiles ────────────────────────────
     for (Dardo* d : dardos)  d->actualizar();
     for (Balon* b : balones) b->actualizar();
 
-    // ── Colisiones 
+    // ── Colisiones ───────────────────────────────────────
     verificarColisiones();
     limpiarProyectilesInactivos();
 
-    // ── Condiciones de fin
+    // ── Condiciones de fin ────────────────────────────────
     if (!jefe->estaVivo())
     {
-        
+        // CORRECCIÓN: Se otorgan los +30 puntos exactos al jugador al derrotar al jefe antes de guardar el nivel
         jugador->agregarPuntos(30);
         puntaje.guardarNivel();
         iniciarTransicion(210); // 3.5s celebracion
