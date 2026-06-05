@@ -2,45 +2,50 @@
 #define NIVELBOSS_H
 
 #include "Nivel.h"
-#include "Enemigo.h" 
-#include <vector>
-#include <cmath>
+#include "JefeFinal.h"
+#include "Dardo.h"
+#include "Balon.h"
+#include "AgenteIA.h"
+#include "TemporizadorJuego.h"
+#include <stdexcept>
+#include <cstdlib>
 
-class Obstaculo : public Entidad
-{
-public:
-    Obstaculo(float x, float y, int w, int h) : Entidad(x, y, w, h) {}
-    void mover() override {}
-    void actualizar() override {}
-};
-
-class NivelSelva : public Nivel
+// Nivel 2: Combate contra el jefe en la arena de Jumanji.
+// Vista fija. El jugador lanza balones hacia arriba para golpear al boss
+// que oscila en una liana (fisica sinusoidal).
+class NivelBoss : public Nivel
 {
 private:
-    int distanciaRecorrida;
-    int tiempoNivel;
-    int enemigosDerrotados;
-    float metaX;
-    int ticksInvulnerable;
+    JefeFinal*           jefe;
+    AgenteIA*            ia;
+    TemporizadorJuego    temporizador;
 
-    std::vector<Obstaculo*> obstaculos;
+    std::vector<Dardo*>  dardos;
+    std::vector<Balon*>  balones;
+
+    int  dificultad;
+    bool modoFuria;
+    int  ultimoTickAtaque;
+    int  intervaloAtaque;     // ticks entre dardos (varia con dificultad)
+    int  ticksInvulnerable;
+
+    void limpiarProyectilesInactivos();
+    void verificarColisiones();
 
 public:
-    NivelSelva();
-    ~NivelSelva();
+    NivelBoss(int dificultad = 1);
+    ~NivelBoss();
 
+    void actualizar()         override;
+    void cargarNivel()        override;
+    void lanzarBalon()        override;
+    void lanzarDardo();
 
-    void actualizar() override;
-    void cargarNivel() override;
-    void lanzarBalon() override;
-
-   
-    int getDistancia() const;
-    int getTiempoSegundos() const;
-    int getEnemigosDerrotados() const;
-    float getProgresoMeta() const;
-
-    const std::vector<Obstaculo*>& getObstaculos() const;
+    JefeFinal*            getJefe()    const;
+    std::vector<Dardo*>&  getDardos();
+    std::vector<Balon*>&  getBalones();
+    int                   getTiempoSegundos() const;
+    bool                  getModoFuria()      const;
 };
 
 #endif
