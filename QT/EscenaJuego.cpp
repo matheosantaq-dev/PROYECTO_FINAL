@@ -104,31 +104,45 @@ NivelBoss* EscenaJuego::obtenerNivelBossActual()
 
 void EscenaJuego::cargarSprites()
 {
-    // ── Jugador ──────────────────────────────────────────────
-    shIdle  .load(":/new/Recursos/jugador/spritejugador1.png");
-    shRun1  .load(":/new/Recursos/jugador/spritejugador2.png");
-    shRun2  .load(":/new/Recursos/jugador/spritejugador3.png");
-    shThrow .load(":/new/Recursos/jugador/spritejugador4.png");
-    shJump  .load(":/new/Recursos/jugador/spritejugador5.png");
-    shCrouch.load(":/new/Recursos/jugador/spritejugador6.png");
+    // Define el color exacto que rodea a las figuras para volverlo invisible
+    QColor colorFondoARemover = Qt::white; 
 
-    // ── Enemigos ─────────────────────────────────────────────
-    shBoar      .load(":/new/Recursos/enemigos/enemigo1.png");
-    shBossSwingL.load(":/new/Recursos/enemigos/enemigo2.png");
-    shBossSwingR.load(":/new/Recursos/enemigos/enemigo3.png");
-    shBossFire  .load(":/new/Recursos/enemigos/enemigo4.png");
-    shBossHit   .load(":/new/Recursos/enemigos/enemigo5.png");
+    // Función lambda auxiliar para cargar la imagen y aplicar la máscara transparente
+    auto cargarTransparente = [colorFondoARemover](QPixmap& pixmap, const QString& ruta) {
+        if (pixmap.load(ruta)) {
+            QBitmap mascara = pixmap.createMaskFromColor(colorFondoARemover, Qt::MaskInvertAlpha);
+            pixmap.setMask(mascara);
+        } else {
+            qDebug() << "Error crítico: No se pudo cargar el archivo en la ruta:" << ruta;
+        }
+    };
 
-    // ── Proyectiles ───────────────────────────────────────────
-    shDartH.load(":/new/Recursos/proyectil/proyectil1.png");
-    shDartA.load(":/new/Recursos/proyectil/proyectil2.png");
-    shArrow.load(":/new/Recursos/proyectil/proyectil3.png");
-    shBall .load(":/new/Recursos/proyectil/proyectil4.png");
+    // ── 1. CANAL JUGADOR (Remoción de fondo sin alterar la figura) ──
+    cargarTransparente(shIdle,   ":/new/Recursos/jugador/spritejugador1.png");
+    cargarTransparente(shRun1,   ":/new/Recursos/jugador/spritejugador2.png");
+    cargarTransparente(shRun2,   ":/new/Recursos/jugador/spritejugador3.png");
+    cargarTransparente(shThrow,  ":/new/Recursos/jugador/spritejugador4.png");
+    cargarTransparente(shJump,   ":/new/Recursos/jugador/spritejugador5.png");
+    cargarTransparente(shCrouch, ":/new/Recursos/jugador/spritejugador6.png");
 
-    // ── HUD ───────────────────────────────────────────────────
+    // ── 2. CANAL ENEMIGOS (Remoción de fondo sin alterar la figura) ──
+    cargarTransparente(shBoar,       ":/new/Recursos/enemigos/enemigo1.png");
+    cargarTransparente(shBossSwingL, ":/new/Recursos/enemigos/enemigo2.png");
+    cargarTransparente(shBossSwingR, ":/new/Recursos/enemigos/enemigo3.png");
+    cargarTransparente(shBossFire,   ":/new/Recursos/enemigos/enemigo4.png");
+    cargarTransparente(shBossHit,    ":/new/Recursos/enemigos/enemigo5.png");
+
+    // ── 3. CANAL PROYECTILES (Remoción de fondo sin alterar la figura) ──
+    cargarTransparente(shDartH, ":/new/Recursos/proyectil/proyectil1.png");
+    cargarTransparente(shDartA, ":/new/Recursos/proyectil/proyectil2.png");
+    cargarTransparente(shArrow, ":/new/Recursos/proyectil/proyectil3.png");
+    cargarTransparente(shBall,  ":/new/Recursos/proyectil/proyectil4.png");
+
+    // ── 4. CANAL HUD ──
+    // Se carga nativo asumiendo que ya posee canal alpha transparente
     shHud.load(":/new/Recursos/hud/hud.png");
 
-    // ── Fondos ────────────────────────────────────────────────
+    // ── 5. CANALES DE FONDO (No se remueve color ya que llenan toda la pantalla) ──
     QPixmap bg1_raw(":/new/Recursos/fondos/fondo1.png");
     bgNivel1 = bg1_raw.scaled(4608, 720, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
@@ -269,7 +283,7 @@ void EscenaJuego::tick()
 
     // ── Tick de animación del jugador ────────────────────────
     ticksFrame++;
-    if (ticksFrame >= 6) {
+    if (ticksFrame >= 9) {
         ticksFrame = 0;
         frameActual = (frameActual + 1) % 7;
     }
@@ -438,31 +452,26 @@ void EscenaJuego::dibujarJugadorNivel1(QPainter& p, Jugador* jugador)
     if (jugador->getSaltando()) {
         // jump: 4 frames de 516x512
         sprite = frame(shJump, frameActual % 4, 516, 512);
-
     } else if (jugador->getAgachado()) {
         // crouch: 4 frames de 516x512
         sprite = frame(shCrouch, frameActual % 4, 516, 512);
-
     } else if (teclaEspacio) {
         // throw: 4 frames de 448x592
         sprite = frame(shThrow, frameActual % 4, 448, 592);
-
     } else if (teclaIzq || teclaDer) {
-        // Alterna entre run1 (7 frames 363x416) y run2 (6 frames 344x512)
-        if (frameActual % 2 == 0)
-            sprite = frame(shRun1, frameActual % 7, 363, 416);
-        else
-            sprite = frame(shRun2, frameActual % 6, 344, 512);
-
+        // Solución al bug del parpadeo: tiramos de shRun1 estable con sus 7 frames de 363x416
+        sprite = frame(shRun1, frameActual % 7, 363, 416);
     } else {
         // idle: 4 frames de 636x416
         sprite = frame(shIdle, frameActual % 4, 636, 416);
     }
 
+    // Inversión horizontal fluida del sprite según la orientación lógica
     if (!jugador->estaMirandoDerecha()) {
         sprite = sprite.transformed(QTransform().scale(-1, 1));
     }
 
+    // Centrado visual respecto a la Hitbox física del backend
     p.drawPixmap(
         static_cast<int>(jugador->getX()) - static_cast<int>(camaraX) - 16,
         static_cast<int>(jugador->getY()) - 32,
@@ -479,19 +488,12 @@ void EscenaJuego::dibujarJugadorNivel2(QPainter& p, Jugador* jugador)
 
     if (jugador->getSaltando()) {
         sprite = frame(shJump, frameActual % 4, 516, 512);
-
     } else if (jugador->getAgachado()) {
         sprite = frame(shCrouch, frameActual % 4, 516, 512);
-
     } else if (teclaEspacio) {
         sprite = frame(shThrow, frameActual % 4, 448, 592);
-
     } else if (teclaIzq || teclaDer) {
-        if (frameActual % 2 == 0)
-            sprite = frame(shRun1, frameActual % 7, 363, 416);
-        else
-            sprite = frame(shRun2, frameActual % 6, 344, 512);
-
+        sprite = frame(shRun1, frameActual % 7, 363, 416);
     } else {
         sprite = frame(shIdle, frameActual % 4, 636, 416);
     }
@@ -505,7 +507,6 @@ void EscenaJuego::dibujarJugadorNivel2(QPainter& p, Jugador* jugador)
         static_cast<int>(jugador->getY()) - 32,
         escalar(sprite, 96, 96));
 }
-
 // ============================================================
 //  DIBUJAR BOSS  —  cambia de sheet según fase + animado
 // ============================================================
@@ -617,13 +618,13 @@ void EscenaJuego::dibujarHUD(QPainter& p, Jugador* jugador, int tiempo, int punt
     }
 
     // ── Icono rayo + power-ups activos ──
-    if (jugador->esFortachon() || jugador->esVeloz()) {
+    if (jugador->getModoFortachon() || jugador->getModoVeloz()) {
         QPixmap icoRayo = frame(shHud, 3, 516, 512);
         p.drawPixmap(220, PAD + ICO + 10, escalar(icoRayo, ICO, ICO));
         p.setFont(QFont("Courier", 9, QFont::Bold));
         QString powers;
-        if (jugador->esFortachon()) { p.setPen(QColor("#FF3366")); powers += "FORTACHON "; }
-        if (jugador->esVeloz())     { p.setPen(QColor("#33FF66")); powers += "VELOZ"; }
+        if (jugador->getModoFortachon()) { p.setPen(QColor("#FF3366")); powers += "FORTACHON "; }
+        if (jugador->getModoVeloz())     { p.setPen(QColor("#33FF66")); powers += "VELOZ"; }
         p.drawText(220 + ICO + SEP, PAD + ICO + 10 + ICO - 6, powers);
     }
 }
