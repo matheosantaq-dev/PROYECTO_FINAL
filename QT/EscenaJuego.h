@@ -69,6 +69,8 @@ private:
     int ticksParpadeo;
     int tiempoPartida;
     int puntajeFinal;
+    float camaraX;
+    GameManager* gm;
 
  
     // CANALES DE TEXTURAS Y HOJAS DE SPRITES (SPRITESHEETS)
