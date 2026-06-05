@@ -1,5 +1,5 @@
-#ifndef NIVELSELVA_H
-#define NIVELSELVA_H
+#ifndef NIVELBOSS_H
+#define NIVELBOSS_H
 
 #include "Nivel.h"
 #include "Enemigo.h" 
