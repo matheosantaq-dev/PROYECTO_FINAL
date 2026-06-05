@@ -497,8 +497,14 @@ void EscenaJuego::dibujarProyectiles(QPainter& p, NivelBoss* nivel)
 
     auto dardosActuales = nivel->getDardos();
     for (auto* dardo : dardosActuales) {
-        if (dardo) {
-            p.drawPixmap(static_cast<int>(dardo->getX()), static_cast<int>(dardo->getY()), escalar(shDartH, 32, 16));
+        if (dardo && dardo->estaActivo()) {
+        QPixmap dartFrame = frame(shDartA, 1, 512, 256); // flecha diagonal
+        // Rotar 90° para que caiga verticalmente
+        QTransform rot;
+        rot.rotate(90);
+        p.drawPixmap(static_cast<int>(dardo->getX()) - 8,
+                     static_cast<int>(dardo->getY()) - 8,
+                     escalar(dartFrame.transformed(rot), 16, 32));
         }
     }
 
